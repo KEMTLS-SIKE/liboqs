@@ -8,6 +8,8 @@
 #include <oqs/common.h>
 #include <oqs/sha3.h>
 
+#include "./async_batch_lib/batch.c"
+
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 { // SIKE's key generation using compression
   // Outputs: secret key sk (CRYPTO_SECRETKEYBYTES = MSG_BYTES + SECRETKEY_A_BYTES + CRYPTO_PUBLICKEYBYTES + FP2_ENCODED_BYTES bytes)

@@ -27,8 +27,13 @@
 
 typedef struct batch_ctx_st BATCH_CTX;
 typedef struct batch_store_st BATCH_STORE;
+typedef struct kem_keypair KEM_KEYPAIR;
 
 #define BATCH_STORE_N 2
+struct kem_keypair {
+    uint8_t *pk;
+    uint8_t *sk;
+} /* optional variable list */;
 
 struct batch_ctx_st {
     const struct engntru_kem_nid_data_st *nid_data;

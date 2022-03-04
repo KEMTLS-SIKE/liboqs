@@ -55,7 +55,7 @@ OQS_KEM *OQS_KEM_sike_p434_compressed_new() {
 	kem->length_ciphertext = OQS_KEM_sike_p434_compressed_length_ciphertext;
 	kem->length_shared_secret = OQS_KEM_sike_p434_compressed_length_shared_secret;
 
-	kem->keypair = OQS_KEM_sike_p434_compressed_keypair;
+	kem->keypair = OQS_KEM_sike_p434_compressed_keypair_async;
 	kem->encaps = OQS_KEM_sike_p434_compressed_encaps;
 	kem->decaps = OQS_KEM_sike_p434_compressed_decaps;
 
@@ -175,7 +175,7 @@ OQS_KEM *OQS_KEM_sike_p610_compressed_new() {
 	kem->length_ciphertext = OQS_KEM_sike_p610_compressed_length_ciphertext;
 	kem->length_shared_secret = OQS_KEM_sike_p610_compressed_length_shared_secret;
 
-	kem->keypair = OQS_KEM_sike_p610_compressed_keypair;
+	kem->keypair = OQS_KEM_sike_p610_compressed_keypair_async;
 	kem->encaps = OQS_KEM_sike_p610_compressed_encaps;
 	kem->decaps = OQS_KEM_sike_p610_compressed_decaps;
 

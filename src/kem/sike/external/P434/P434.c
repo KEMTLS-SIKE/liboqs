@@ -133,7 +133,6 @@ static const unsigned int strat_Bob[MAX_Bob - 1] = {
 #define mp_add_asm oqs_kem_sike_mp_add434_asm
 #define mp_subaddx2_asm oqs_kem_sike_mp_subadd434x2_asm
 #define mp_dblsubx2_asm oqs_kem_sike_mp_dblsub434x2_asm
-#define crypto_kem_async_batch OQS_KEM_sike_p434_async_batch
 #define crypto_kem_keypair OQS_KEM_sike_p434_keypair
 #define crypto_kem_enc OQS_KEM_sike_p434_encaps
 #define crypto_kem_dec OQS_KEM_sike_p434_decaps

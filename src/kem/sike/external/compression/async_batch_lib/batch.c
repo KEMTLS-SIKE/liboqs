@@ -22,6 +22,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include <openssl/crypto.h>
 
 #include "batch.h"
 
@@ -30,10 +31,18 @@
 #define BATCH_SIZE 32
 
 static void *crypto_kem_async_batch_filler_routine(void *arg);
+int crypto_kem_keypair(unsigned char *pk, unsigned char *sk);
+
+static void *zalloc(size_t size){
+  void *ptr = malloc(size);
+  if(ptr == NULL) return NULL;
+  return memset(ptr, 0, size);
+}
 
 static pthread_once_t init_once = PTHREAD_ONCE_INIT;
+static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER; 
 static struct {
-    pthread_mutex_t lock;
+    pthread_mutex_t *lock;
     int ref_count;
 
     BATCH_CTX *ctx;
@@ -42,7 +51,9 @@ static struct {
 static
 void crypto_kem_async_batch_global_ctx_lock_init(void)
 {
-  if (pthread_mutex_init(&crypto_kem_async_batch_global_ctx.lock, NULL) != 0) {
+  crypto_kem_async_batch_global_ctx.lock = &mut;
+  
+  if (pthread_mutex_init(crypto_kem_async_batch_global_ctx.lock, NULL) != 0) {
     perror("mutex_lock");                                                       
     exit(1);
   }
@@ -68,10 +79,10 @@ static int crypto_kem_async_batch_keypair(unsigned char *pk,
 }
 
 static inline
-int BATCH_STORE_fill(BATCH_STORE *store, int nid, size_t batch_size)
+int BATCH_STORE_fill(BATCH_STORE *store, size_t batch_size)
 {
     int (*crypto_kem_batch_keygen_fn)(unsigned char *pk, unsigned char *sk, unsigned n) = crypto_kem_async_batch_keypair;
-
+    
     if (crypto_kem_batch_keygen_fn(store->pks, store->sks, batch_size) == 0) {
         store->available = batch_size;
         return 1;
@@ -80,7 +91,7 @@ int BATCH_STORE_fill(BATCH_STORE *store, int nid, size_t batch_size)
 }
 
 static inline
-BATCH_STORE *BATCH_STORE_new(const struct engntru_kem_nid_data_st *nid_data, size_t batch_size)
+BATCH_STORE *BATCH_STORE_new(size_t batch_size)
 {
     int ok = 0;
     BATCH_STORE *store = NULL;
@@ -98,14 +109,14 @@ BATCH_STORE *BATCH_STORE_new(const struct engntru_kem_nid_data_st *nid_data, siz
     store->pks = &(store->_data[0]);
     store->sks = &(store->_data[pks_len]);
 
-    if (!BATCH_STORE_fill(store, 0, batch_size))
+    if (!BATCH_STORE_fill(store, batch_size))
         goto end;
 
     ok = 1;
 
  end:
     if (!ok) {
-        OQS_MEM_unsecure_free(store);
+        OQS_MEM_insecure_free(store);
         store = NULL;
     }
     return store;
@@ -125,7 +136,7 @@ void BATCH_STORE_free(BATCH_STORE *store)
 }
 
 static inline
-BATCH_CTX *BATCH_CTX_new(const struct engntru_kem_nid_data_st *nid_data)
+BATCH_CTX *BATCH_CTX_new(void)
 {
     int i;
     int ok = 0;
@@ -134,8 +145,6 @@ BATCH_CTX *BATCH_CTX_new(const struct engntru_kem_nid_data_st *nid_data)
 
     if (NULL == (ctx = zalloc(sizeof(*ctx))))
         goto err;
-
-    ctx->nid_data = nid_data;
 
     batch_size = ctx->batch_size = BATCH_SIZE;
 
@@ -146,9 +155,8 @@ BATCH_CTX *BATCH_CTX_new(const struct engntru_kem_nid_data_st *nid_data)
             || pthread_cond_init(&ctx->emptied, NULL)
             || pthread_cond_init(&ctx->filled, NULL))
         goto err;
-
     for (i = 0; i < BATCH_STORE_N; i++) {
-        if (NULL == (ctx->stores[i] = BATCH_STORE_new(nid_data, batch_size)))
+        if (NULL == (ctx->stores[i] = BATCH_STORE_new(batch_size)))
             goto err;
     }
 
@@ -241,7 +249,7 @@ void BATCH_CTX_free(BATCH_CTX *ctx)
 }
 
 static inline
-int BATCH_STORE_get_keypair(BATCH_STORE *store, ENGNTRU_KEM_KEYPAIR *kp)
+int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp)
 {
     int ret = 0;
     size_t i;
@@ -273,7 +281,7 @@ int BATCH_STORE_get_keypair(BATCH_STORE *store, ENGNTRU_KEM_KEYPAIR *kp)
 }
 
 static inline
-int BATCH_CTX_get_keypair(BATCH_CTX *ctx, ENGNTRU_KEM_KEYPAIR *kp)
+int BATCH_CTX_get_keypair(BATCH_CTX *ctx, KEM_KEYPAIR *kp)
 {
     int ret = 0, r;
 
@@ -309,21 +317,24 @@ int BATCH_CTX_get_keypair(BATCH_CTX *ctx, ENGNTRU_KEM_KEYPAIR *kp)
     return ret;
 }
 
-static inline
-int crypto_kem_async_batch_get_keypair(ENGNTRU_KEM_KEYPAIR *kp)
+
+static
+int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
 {
     BATCH_CTX *ctx = NULL;
 
+    int err;
     info("CALLED\n");
 
     /* This is always called only internally, assume kp is valid */
 
-    if (pthread_mutex_lock(&crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if ((err = pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock)) != 0) {
+        fprintf(stderr, "keypair %d", err);
         errorf("Failed acquiring global_ctx.lock\n");
         return 0;
     }
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
-        ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new(kp->nid_data);
+        ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();
         if (ctx == NULL)
             return 0;
     } else {
@@ -344,28 +355,38 @@ int crypto_kem_async_batch_get_keypair(ENGNTRU_KEM_KEYPAIR *kp)
 
 int crypto_kem_async_batch_init(void)
 {
+    BATCH_CTX *ctx = NULL;
     if (pthread_once(&init_once, crypto_kem_async_batch_global_ctx_lock_init) != 0)
         return 0;
 
-    if (pthread_mutex_lock(&crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
         errorf("Failed acquiring global_ctx.lock\n");
         return 0;
     }
 
     crypto_kem_async_batch_global_ctx.ref_count++;
+    fprintf(stderr, "ref count: %d\n", crypto_kem_async_batch_global_ctx.ref_count);
 
-    if (pthread_mutex_unlock(&crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
+        ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();
+        if (ctx == NULL)
+            return 0;
+    } else {
+        ctx = crypto_kem_async_batch_global_ctx.ctx;
+    }
+
+    if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
         errorf("Failed releasing global_ctx.lock\n");
         return 0;
     }
-
+    
     return 1;
 }
 
-int crypto_kem_async_batch_deinit(void)
+static int crypto_kem_async_batch_deinit(void)
 {
     CRYPTO_RWLOCK *l = NULL;
-    if (pthread_mutex_lock(&crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
         errorf("Failed acquiring global_ctx.lock\n");
         return 0;
     }
@@ -374,8 +395,8 @@ int crypto_kem_async_batch_deinit(void)
 
     if (crypto_kem_async_batch_global_ctx.ref_count == 0) {
         BATCH_CTX_free(crypto_kem_async_batch_global_ctx.ctx);
-        // l = global_ctx.lock;
-        // global_ctx.lock = NULL;
+        l = crypto_kem_async_batch_global_ctx.lock;
+        crypto_kem_async_batch_global_ctx.lock = NULL;
         if (pthread_mutex_unlock(l) != 0) {
             errorf("Failed releasing global_ctx.lock\n");
             return 0;
@@ -383,7 +404,7 @@ int crypto_kem_async_batch_deinit(void)
         // TODO: move back to a pointer for the lock
         // CRYPTO_THREAD_lock_free(l);
     } else {
-        if (pthread_mutex_unlock(&crypto_kem_async_batch_global_ctx.lock) != 0) {
+        if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
             errorf("Failed releasing global_ctx.lock\n");
             return 0;
         }
@@ -442,7 +463,7 @@ int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
 
         for (--j; j >= 0; j--) {
             debug("(%d) filling q[%d]\n", nid, j);
-            if (!BATCH_STORE_fill(q[j], nid, batch_size)) {
+            if (!BATCH_STORE_fill(q[j], batch_size)) {
                 errorf("(%d) BATCH_STORE_fill() failed\n", nid);
                 goto end;
             }

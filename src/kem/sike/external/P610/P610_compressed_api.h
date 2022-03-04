@@ -11,6 +11,8 @@
 
 // OQS note: size #defines moved to P610_compressed.c to avoid redefinitions across parameters
 
+int OQS_KEM_sike_p610_compressed_async_init(void);
+int OQS_KEM_sike_p610_compressed_keypair_async(unsigned char *pk, unsigned char *sk);
 // SIKE's key generation
 // It produces a private key sk and computes the public key pk.
 // Outputs: secret key sk (CRYPTO_SECRETKEYBYTES = 491 bytes)

@@ -22,6 +22,14 @@ static OQS_STATUS test_sike_async(void) {
   //sleep(1);
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+  int err = OQS_KEM_sike_p610_compressed_async_init();
+  gettimeofday(&timecheck, NULL);
+  end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+  fprintf(stderr, "Init returned: %d\n", err);
+  printf("%ld milliseconds elapsed\n", (end - start));
+
+  gettimeofday(&timecheck, NULL);
+  start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   for (int i = 0; i < 30; i++) {
     rc = OQS_KEM_sike_p610_compressed_keypair_async(public_key, secret_key);
@@ -33,15 +41,12 @@ static OQS_STATUS test_sike_async(void) {
 
   gettimeofday(&timecheck, NULL);
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
-
   printf("%ld milliseconds elapsed\n", (end - start));
   return OQS_SUCCESS;
 #endif
 }
 int main(void)
 {
-  int err = OQS_KEM_sike_p610_compressed_async_init();
-  fprintf(stderr, "Init returned: %d\n", err);
   test_sike_async();
   fprintf(stderr, "Finished\n");
   return 0;

@@ -11,6 +11,9 @@
 
 // OQS note: size #defines moved to P751.c to avoid redefinitions across parameters
 
+int OQS_KEM_sike_p751_compressed_async_init(void);
+int OQS_KEM_sike_p751_compressed_async_deinit(void);
+int OQS_KEM_sike_p751_compressed_keypair_async(unsigned char *pk, unsigned char *sk);
 // SIKE's key generation
 // It produces a private key sk and computes the public key pk.
 // Outputs: secret key sk (CRYPTO_SECRETKEYBYTES = 414 bytes)

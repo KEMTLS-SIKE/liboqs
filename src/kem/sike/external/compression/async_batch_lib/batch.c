@@ -383,7 +383,7 @@ int crypto_kem_async_batch_init(void)
     return 1;
 }
 
-static int crypto_kem_async_batch_deinit(void)
+int crypto_kem_async_batch_deinit(void)
 {
     CRYPTO_RWLOCK *l = NULL;
     if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {

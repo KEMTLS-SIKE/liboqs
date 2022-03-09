@@ -18,17 +18,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "debug/debug.h"
 
 #include <string.h>
 #include <stdint.h>
-#include <openssl/crypto.h>
 
 #include "batch.h"
 
 #include <pthread.h>
 
-#define BATCH_SIZE 32
+#define BATCH_SIZE 10
 
 static void *crypto_kem_async_batch_filler_routine(void *arg);
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk);
@@ -54,7 +52,6 @@ void crypto_kem_async_batch_global_ctx_lock_init(void)
   crypto_kem_async_batch_global_ctx.lock = &mut;
   
   if (pthread_mutex_init(crypto_kem_async_batch_global_ctx.lock, NULL) != 0) {
-    perror("mutex_lock");                                                       
     exit(1);
   }
 }
@@ -70,7 +67,6 @@ static int crypto_kem_async_batch_keypair(unsigned char *pk,
     ret = crypto_kem_keypair(pk + i * CRYPTO_PUBLICKEYBYTES,
                              sk + i * CRYPTO_SECRETKEYBYTES);
     if (ret != 0) {
-      errorf("Error generating keypair");
       return 1;
     }
   }
@@ -108,9 +104,9 @@ BATCH_STORE *BATCH_STORE_new(size_t batch_size)
     store->data_size = data_size;
     store->pks = &(store->_data[0]);
     store->sks = &(store->_data[pks_len]);
-
+/*
     if (!BATCH_STORE_fill(store, batch_size))
-        goto end;
+        goto end;*/
 
     ok = 1;
 
@@ -162,22 +158,16 @@ BATCH_CTX *BATCH_CTX_new(void)
 
     if (pthread_create(&ctx->filler_th, NULL,
                 &crypto_kem_async_batch_filler_routine, (void*)ctx)) {
-        fatalf("pthread_create() failed\n");
         goto err;
     }
 
-    debug("locking mutex")
     pthread_mutex_lock(&ctx->mutex);
-    debug("locked mutex");
 
     while (ctx->store == NULL) {
-        debug("wait on filled\n");
         pthread_cond_wait(&ctx->filled, &ctx->mutex);
     }
 
-    debug("awake")
 
-    debug("unlocking mutex\n");
     pthread_mutex_unlock(&ctx->mutex);
 
     ok = 1;
@@ -188,18 +178,17 @@ BATCH_CTX *BATCH_CTX_new(void)
             BATCH_STORE_free(ctx->stores[i]);
         }
         if (pthread_cond_destroy(&ctx->filled)) {
-            errorf("Failed destroying filled cond\n");
+            fprintf(stderr, "Failed destroying filled cond\n");
         }
         if (pthread_cond_destroy(&ctx->emptied)) {
-            errorf("Failed destroying emptied cond\n");
+            fprintf(stderr, "Failed destroying emptied cond\n");
         }
         if (pthread_mutex_destroy(&ctx->mutex)) {
-            errorf("Failed destroying mutex\n");
+            fprintf(stderr, "Failed destroying mutex\n");
         }
         OQS_MEM_insecure_free(ctx);
         ctx = NULL;
     }
-    debug("done\n");
     return ctx;
 }
 
@@ -214,26 +203,21 @@ void BATCH_CTX_free(BATCH_CTX *ctx)
         return;
 
 
-    debug("locking mutex")
     pthread_mutex_lock(&ctx->mutex);
-    debug("locked mutex");
 
     ctx->destroy = 1;
     ctx->store = NULL;
 
-    debug("signal emptied (for destroy)\n");
     pthread_cond_signal(&ctx->emptied);
 
-    debug("unlocking mutex\n");
     pthread_mutex_unlock(&ctx->mutex);
 
-    debug("pthread_join()\n");
     if (pthread_join(ctx->filler_th, &tret)) {
-        errorf("pthread_join() failed\n");
+        fprintf(stderr, "pthread_join() failed\n");
     } else {
         intptr_t ret = (intptr_t)tret;
         if (ret != 1)
-            errorf("filler thread returned %" PRIxPTR "\n", ret);
+            fprintf(stderr, "filler thread returned %" PRIxPTR "\n", ret);
     }
 
     for (i=0; i<BATCH_STORE_N; i++) {
@@ -243,7 +227,7 @@ void BATCH_CTX_free(BATCH_CTX *ctx)
     if (pthread_cond_destroy(&ctx->filled)
             || pthread_cond_destroy(&ctx->emptied)
             || pthread_mutex_destroy(&ctx->mutex))
-        errorf("failure destroying cond or mutex\n");
+        fprintf(stderr, "failure destroying cond or mutex\n");
 
     OQS_MEM_insecure_free(ctx);
 }
@@ -256,7 +240,6 @@ int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp)
 
     if (store->available == 0) {
         /* This branch should never be taken */
-        fatalf("Store should never be empty\n");
         return 0;
     }
     i = --store->available;
@@ -285,15 +268,11 @@ int BATCH_CTX_get_keypair(BATCH_CTX *ctx, KEM_KEYPAIR *kp)
 {
     int ret = 0, r;
 
-    debug("locking mutex")
     pthread_mutex_lock(&ctx->mutex);
-    debug("locked mutex");
 
     while (ctx->store == NULL) {
-        debug("wait on filled\n");
         pthread_cond_wait(&ctx->filled, &ctx->mutex);
     }
-    debug("awake")
 
     r = BATCH_STORE_get_keypair(ctx->store, kp);
     if (r == -1) {
@@ -302,16 +281,13 @@ int BATCH_CTX_get_keypair(BATCH_CTX *ctx, KEM_KEYPAIR *kp)
          */
         ctx->store = NULL;
 
-        debug("signal emptied\n");
         pthread_cond_signal(&ctx->emptied);
     } else if (r != 1) {
-        errorf("BATCH_STORE_get_keypair() failed\n");
         goto end;
     }
 
     ret = 1;
  end:
-    debug("unlocking mutex\n");
     pthread_mutex_unlock(&ctx->mutex);
 
     return ret;
@@ -324,13 +300,11 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
     BATCH_CTX *ctx = NULL;
 
     int err;
-    info("CALLED\n");
 
     /* This is always called only internally, assume kp is valid */
 
     if ((err = pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock)) != 0) {
-        fprintf(stderr, "keypair %d", err);
-        errorf("Failed acquiring global_ctx.lock\n");
+        //fprintf(stderr, "keypair %d", err);
         return 0;
     }
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
@@ -341,12 +315,10 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
         ctx = crypto_kem_async_batch_global_ctx.ctx;
     }
     if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        errorf("Failed releasing global_ctx.lock\n");
         return 0;
     }
 
     if (!BATCH_CTX_get_keypair(ctx, kp)) {
-        errorf("BATCH_CTX_get_keypair() failed\n");
         return 0;
     }
 
@@ -360,12 +332,11 @@ int crypto_kem_async_batch_init(void)
         return 0;
 
     if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        errorf("Failed acquiring global_ctx.lock\n");
         return 0;
     }
 
     crypto_kem_async_batch_global_ctx.ref_count++;
-    fprintf(stderr, "ref count: %d\n", crypto_kem_async_batch_global_ctx.ref_count);
+    //fprintf(stderr, "ref count: %d\n", crypto_kem_async_batch_global_ctx.ref_count);
 
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
         ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();
@@ -376,7 +347,6 @@ int crypto_kem_async_batch_init(void)
     }
 
     if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        errorf("Failed releasing global_ctx.lock\n");
         return 0;
     }
     
@@ -387,7 +357,6 @@ int crypto_kem_async_batch_deinit(void)
 {
     CRYPTO_RWLOCK *l = NULL;
     if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        errorf("Failed acquiring global_ctx.lock\n");
         return 0;
     }
 
@@ -398,14 +367,12 @@ int crypto_kem_async_batch_deinit(void)
         l = crypto_kem_async_batch_global_ctx.lock;
         crypto_kem_async_batch_global_ctx.lock = NULL;
         if (pthread_mutex_unlock(l) != 0) {
-            errorf("Failed releasing global_ctx.lock\n");
             return 0;
         }
         // TODO: move back to a pointer for the lock
         // CRYPTO_THREAD_lock_free(l);
     } else {
         if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-            errorf("Failed releasing global_ctx.lock\n");
             return 0;
         }
     }
@@ -419,25 +386,19 @@ int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
     int ret = 0;
     int i, j;
     // int nid = ctx->nid_data->nid;
-    int nid = 0;
+    //int nid = 0;
     size_t batch_size = ctx->batch_size;
     BATCH_STORE *q[BATCH_STORE_N] = { NULL };
 
-    debug("(%d) started\n", nid);
 
     while (1) {
-        debug("locking mutex\n");
         pthread_mutex_lock(&ctx->mutex);
-        debug("(%d) locked mutex\n", nid);
 
         while (ctx->store != NULL && ctx->destroy != 1) {
-            debug("(%d) wait on emptied\n", nid);
             pthread_cond_wait(&ctx->emptied, &ctx->mutex);
         }
-        debug("(%d) awake\n", nid);
 
         if (ctx->destroy) {
-            debug("(%d) destroy signal\n", nid);
             break;
         }
 
@@ -445,39 +406,31 @@ int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
 
         for (i = 0, j = 0; i < BATCH_STORE_N; i++) {
             if (ctx->stores[i]->available == 0) {
-                debug("(%d) queuing stores[%d] for refill\n", nid, i);
                 q[j++] = ctx->stores[i];
             } else {
-                debug("(%d) ctx->store = stores[%d]\n", nid, i);
                 ctx->store = ctx->stores[i];
             }
         }
 
         if (ctx->store != NULL) {
-            debug("(%d) broadcast filled\n", nid);
             pthread_cond_broadcast(&ctx->filled);
         }
 
-        debug("(%d) unlocking mutex\n", nid);
         pthread_mutex_unlock(&ctx->mutex);
 
         for (--j; j >= 0; j--) {
-            debug("(%d) filling q[%d]\n", nid, j);
             if (!BATCH_STORE_fill(q[j], batch_size)) {
-                errorf("(%d) BATCH_STORE_fill() failed\n", nid);
                 goto end;
             }
             q[j] = NULL;
         }
     }
 
-    debug("(%d) unlocking mutex\n", nid);
     pthread_mutex_unlock(&ctx->mutex);
 
     ret = 1;
 
  end:
-    debug("(%d) exiting (ret=%d)\n", nid, ret);
     return ret;
 }
 

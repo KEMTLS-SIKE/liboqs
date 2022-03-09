@@ -329,7 +329,7 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
     /* This is always called only internally, assume kp is valid */
 
     if ((err = pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock)) != 0) {
-        fprintf(stderr, "keypair %d", err);
+        // fprintf(stderr, "keypair %d", err);
         errorf("Failed acquiring global_ctx.lock\n");
         return 0;
     }
@@ -365,7 +365,7 @@ int crypto_kem_async_batch_init(void)
     }
 
     crypto_kem_async_batch_global_ctx.ref_count++;
-    fprintf(stderr, "ref count: %d\n", crypto_kem_async_batch_global_ctx.ref_count);
+    // fprintf(stderr, "ref count: %d\n", crypto_kem_async_batch_global_ctx.ref_count);
 
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
         ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();

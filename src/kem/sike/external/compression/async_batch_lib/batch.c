@@ -79,11 +79,11 @@ int BATCH_STORE_fill(BATCH_STORE *store, size_t batch_size)
 {
     int (*crypto_kem_batch_keygen_fn)(unsigned char *pk, unsigned char *sk, unsigned n) = crypto_kem_async_batch_keypair;
     
-    if (crypto_kem_batch_keygen_fn(store->pks, store->sks, batch_size) == 0) {
+    if (crypto_kem_batch_keygen_fn(store->pks, store->sks, batch_size) == 0) { // success
         store->available = batch_size;
-        return 1;
+        return 0;
     }
-    return 0;
+    return 1;
 }
 
 static inline
@@ -105,7 +105,7 @@ BATCH_STORE *BATCH_STORE_new(size_t batch_size)
     store->pks = &(store->_data[0]);
     store->sks = &(store->_data[pks_len]);
 /*
-    if (!BATCH_STORE_fill(store, batch_size))
+    if (BATCH_STORE_fill(store, batch_size))
         goto end;*/
 
     ok = 1;
@@ -235,12 +235,12 @@ void BATCH_CTX_free(BATCH_CTX *ctx)
 static inline
 int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp)
 {
-    int ret = 0;
+    int ret = 1;
     size_t i;
 
     if (store->available == 0) {
         /* This branch should never be taken */
-        return 0;
+        return 1;
     }
     i = --store->available;
 
@@ -257,7 +257,7 @@ int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp)
          */
         ret = -1;
     } else {
-        ret = 1;
+        ret = 0;
     }
 
     return ret;
@@ -266,7 +266,7 @@ int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp)
 static inline
 int BATCH_CTX_get_keypair(BATCH_CTX *ctx, KEM_KEYPAIR *kp)
 {
-    int ret = 0, r;
+    int ret = 1, r;
 
     pthread_mutex_lock(&ctx->mutex);
 
@@ -282,11 +282,11 @@ int BATCH_CTX_get_keypair(BATCH_CTX *ctx, KEM_KEYPAIR *kp)
         ctx->store = NULL;
 
         pthread_cond_signal(&ctx->emptied);
-    } else if (r != 1) {
+    } else if (r != 0) {
         goto end;
     }
 
-    ret = 1;
+    ret = 0;
  end:
     pthread_mutex_unlock(&ctx->mutex);
 
@@ -305,34 +305,34 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
 
     if ((err = pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock)) != 0) {
         //fprintf(stderr, "keypair %d", err);
-        return 0;
+        return 1;
     }
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
         ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();
         if (ctx == NULL)
-            return 0;
+            return 1;
     } else {
         ctx = crypto_kem_async_batch_global_ctx.ctx;
     }
     if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        return 0;
+        return 1;
     }
 
-    if (!BATCH_CTX_get_keypair(ctx, kp)) {
-        return 0;
+    if (BATCH_CTX_get_keypair(ctx, kp)) {
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 
 int crypto_kem_async_batch_init(void)
 {
     BATCH_CTX *ctx = NULL;
     if (pthread_once(&init_once, crypto_kem_async_batch_global_ctx_lock_init) != 0)
-        return 0;
+        return 1;
 
     if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        return 0;
+        return 1;
     }
 
     crypto_kem_async_batch_global_ctx.ref_count++;
@@ -340,23 +340,23 @@ int crypto_kem_async_batch_init(void)
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
         ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();
         if (ctx == NULL)
-            return 0;
+            return 1;
     } else {
         ctx = crypto_kem_async_batch_global_ctx.ctx;
     }
 
     if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        return 0;
+        return 1;
     }
     
-    return 1;
+    return 0;
 }
 
 int crypto_kem_async_batch_deinit(void)
 {
     CRYPTO_RWLOCK *l = NULL;
     if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-        return 0;
+        return 1;
     }
 
     crypto_kem_async_batch_global_ctx.ref_count--;
@@ -366,23 +366,23 @@ int crypto_kem_async_batch_deinit(void)
         l = crypto_kem_async_batch_global_ctx.lock;
         crypto_kem_async_batch_global_ctx.lock = NULL;
         if (pthread_mutex_unlock(l) != 0) {
-            return 0;
+            return 1;
         }
         // TODO: move back to a pointer for the lock
         // CRYPTO_THREAD_lock_free(l);
     } else {
         if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-            return 0;
+            return 1;
         }
     }
 
-    return 1;
+    return 0;
 }
 
 static inline
 int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
 {
-    int ret = 0;
+    int ret = 1;
     int i, j;
     // int nid = ctx->nid_data->nid;
     //int nid = 0;
@@ -418,7 +418,7 @@ int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
         pthread_mutex_unlock(&ctx->mutex);
 
         for (--j; j >= 0; j--) {
-            if (!BATCH_STORE_fill(q[j], batch_size)) {
+            if (BATCH_STORE_fill(q[j], batch_size)) {
                 goto end;
             }
             q[j] = NULL;
@@ -427,7 +427,7 @@ int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
 
     pthread_mutex_unlock(&ctx->mutex);
 
-    ret = 1;
+    ret = 0;
 
  end:
     return ret;

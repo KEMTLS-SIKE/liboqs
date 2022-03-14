@@ -365,7 +365,7 @@ int crypto_kem_async_batch_init(void)
     }
 
     crypto_kem_async_batch_global_ctx.ref_count++;
-    // fprintf(stderr, "ref count: %d\n", crypto_kem_async_batch_global_ctx.ref_count);
+    fprintf(stderr, "ref count: %d\n", crypto_kem_async_batch_global_ctx.ref_count);
 
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
         ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();

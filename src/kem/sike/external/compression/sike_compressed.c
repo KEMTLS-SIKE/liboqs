@@ -16,7 +16,7 @@ int crypto_kem_keypair_async(unsigned char *pk, unsigned char *sk)
   kp.pk = pk;
   kp.sk = sk;
   //crypto_kem_async_batch_init();
-//  fprintf(stderr, "End INIT %d\n", i);
+  //fprintf(stderr, "End INIT %d\n");
   //sleep(1);
   crypto_kem_async_batch_get_keypair(&kp);
   return 0;

@@ -42,7 +42,7 @@ static struct {
     int ref_count;
 
     BATCH_CTX *ctx;
-} crypto_kem_async_batch_global_ctx;
+} crypto_kem_async_batch_global_ctx = {0, NULL};
 
 /* Returns 0 on success, 1 otherwise */
 static int crypto_kem_async_batch_keypair(unsigned char *pk,
@@ -204,7 +204,7 @@ void BATCH_CTX_free(BATCH_CTX *ctx)
         fprintf(stderr, "pthread_join() failed\n");
     } else {
         intptr_t ret = (intptr_t)tret;
-        if (ret != 1)
+        if (ret != 0)
             fprintf(stderr, "filler thread returned %" PRIxPTR "\n", ret);
     }
 

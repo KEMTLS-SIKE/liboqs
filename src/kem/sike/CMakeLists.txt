@@ -29,7 +29,7 @@ if(
    OQS_ENABLE_KEM_sidh_p610_compressed OR
    OQS_ENABLE_KEM_sidh_p751_compressed))
 
-    set(SRCS kem_sike.c)
+    set(SRCS kem_sike.c kem_sike_deinit.c)
     if(OQS_ENABLE_KEM_sike_p434 OR OQS_ENABLE_KEM_sidh_p434)
         set(SRCS ${SRCS} external/P434/P434.c)
     endif()

@@ -171,21 +171,21 @@ OQS_API void OQS_init(void) {
  * Unitializes all async threads.
  */
 OQS_API void OQS_deinit(void) {
-	#ifdef OQS_ENABLE_KEM_sike_p434_compressed
-	OQS_KEM_sike_p434_compressed_async_deinit();
-	#endif
+#ifdef OQS_ENABLE_KEM_sike_p434_compressed
+	// OQS_KEM_sike_p434_compressed_async_deinit();
+#endif
 
-	#ifdef OQS_ENABLE_KEM_sike_p503_compressed
-	OQS_KEM_sike_p503_compressed_async_deinit();
-	#endif
+#ifdef OQS_ENABLE_KEM_sike_p503_compressed
+	// OQS_KEM_sike_p503_compressed_async_deinit();
+#endif
 
-	#ifdef OQS_ENABLE_KEM_sike_p610_compressed
-	OQS_KEM_sike_p610_compressed_async_deinit();
-	#endif
+#ifdef OQS_ENABLE_KEM_sike_p610_compressed
+	// OQS_KEM_sike_p610_compressed_async_deinit();
+#endif
 
-	#ifdef OQS_ENABLE_KEM_sike_p751_compressed
-	OQS_KEM_sike_p751_compressed_async_deinit();
-	#endif
+#ifdef OQS_ENABLE_KEM_sike_p751_compressed
+	// OQS_KEM_sike_p751_compressed_async_deinit();
+#endif
 
 	return;
 }

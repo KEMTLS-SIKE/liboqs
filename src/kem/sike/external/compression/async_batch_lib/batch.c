@@ -37,24 +37,12 @@ static void *zalloc(size_t size){
   return memset(ptr, 0, size);
 }
 
-static pthread_once_t init_once = PTHREAD_ONCE_INIT;
-static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER; 
+static pthread_mutex_t global_mut = PTHREAD_MUTEX_INITIALIZER; 
 static struct {
-    pthread_mutex_t *lock;
     int ref_count;
 
     BATCH_CTX *ctx;
 } crypto_kem_async_batch_global_ctx;
-
-static
-void crypto_kem_async_batch_global_ctx_lock_init(void)
-{
-  crypto_kem_async_batch_global_ctx.lock = &mut;
-  
-  if (pthread_mutex_init(crypto_kem_async_batch_global_ctx.lock, NULL) != 0) {
-    exit(1);
-  }
-}
 
 /* Returns 0 on success, 1 otherwise */
 static int crypto_kem_async_batch_keypair(unsigned char *pk,
@@ -303,7 +291,7 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
 
     /* This is always called only internally, assume kp is valid */
 
-    if ((err = pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock)) != 0) {
+    if ((err = pthread_mutex_lock(&global_mut)) != 0) {
         //fprintf(stderr, "keypair %d", err);
         return 1;
     }
@@ -314,7 +302,7 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
     } else {
         ctx = crypto_kem_async_batch_global_ctx.ctx;
     }
-    if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if (pthread_mutex_unlock(&global_mut) != 0) {
         return 1;
     }
 
@@ -328,10 +316,8 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
 int crypto_kem_async_batch_init(void)
 {
     BATCH_CTX *ctx = NULL;
-    if (pthread_once(&init_once, crypto_kem_async_batch_global_ctx_lock_init) != 0)
-        return 1;
 
-    if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if (pthread_mutex_lock(&global_mut) != 0) {
         return 1;
     }
 
@@ -345,36 +331,34 @@ int crypto_kem_async_batch_init(void)
         ctx = crypto_kem_async_batch_global_ctx.ctx;
     }
 
-    if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if (pthread_mutex_unlock(&global_mut) != 0) {
         return 1;
     }
     
     return 0;
 }
 
+/**
+ * Should be called at the very end of the process, global deinitialization.
+ */
 int crypto_kem_async_batch_deinit(void)
 {
-    CRYPTO_RWLOCK *l = NULL;
-    if (pthread_mutex_lock(crypto_kem_async_batch_global_ctx.lock) != 0) {
+    if (pthread_mutex_lock(&global_mut) != 0) {
         return 1;
     }
 
     crypto_kem_async_batch_global_ctx.ref_count--;
 
-    if (crypto_kem_async_batch_global_ctx.ref_count == 0) {
+    // if (crypto_kem_async_batch_global_ctx.ref_count == 0) {
         BATCH_CTX_free(crypto_kem_async_batch_global_ctx.ctx);
-        l = crypto_kem_async_batch_global_ctx.lock;
-        crypto_kem_async_batch_global_ctx.lock = NULL;
-        if (pthread_mutex_unlock(l) != 0) {
+        if (pthread_mutex_unlock(&global_mut) != 0) {
             return 1;
         }
-        // TODO: move back to a pointer for the lock
-        // CRYPTO_THREAD_lock_free(l);
-    } else {
-        if (pthread_mutex_unlock(crypto_kem_async_batch_global_ctx.lock) != 0) {
-            return 1;
-        }
-    }
+    // } else {
+    //     if (pthread_mutex_unlock(&global_mut) != 0) {
+    //         return 1;
+    //     }
+    // }
 
     return 0;
 }

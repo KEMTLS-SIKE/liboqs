@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 AND MIT
 
 #include <oqs/common.h>
+#include <oqs/kem_sike.h>
 
 #include <errno.h>
 #include <stdint.h>
@@ -163,6 +164,29 @@ OQS_API void OQS_init(void) {
 #if defined(OQS_DIST_BUILD)
 	OQS_CPU_has_extension(OQS_CPU_EXT_INIT);
 #endif
+	return;
+}
+
+/**
+ * Unitializes all async threads.
+ */
+OQS_API void OQS_deinit(void) {
+	#ifdef OQS_ENABLE_KEM_sike_p434_compressed
+	OQS_KEM_sike_p434_compressed_async_deinit();
+	#endif
+
+	#ifdef OQS_ENABLE_KEM_sike_p503_compressed
+	OQS_KEM_sike_p503_compressed_async_deinit();
+	#endif
+
+	#ifdef OQS_ENABLE_KEM_sike_p610_compressed
+	OQS_KEM_sike_p610_compressed_async_deinit();
+	#endif
+
+	#ifdef OQS_ENABLE_KEM_sike_p751_compressed
+	OQS_KEM_sike_p751_compressed_async_deinit();
+	#endif
+
 	return;
 }
 

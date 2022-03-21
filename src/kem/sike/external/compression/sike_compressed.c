@@ -71,6 +71,91 @@ int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk
     return 0;
 }
 
+struct async_enc_keygen_b_arg {
+  unsigned char *ephemeralsk;
+  unsigned char *ct;
+};
+
+
+static
+void *async_enc_keygen_b(void *arg)
+{
+  struct async_enc_keygen_b_arg *params = arg;
+
+  EphemeralKeyGeneration_B_extended(params->ephemeralsk, params->ct, 1);
+
+  return NULL;
+}
+
+struct async_enc_secret_agreement_arg {
+  unsigned char *ephemeralsk;
+  const unsigned char *pk;
+  unsigned char *jinvariant;
+  unsigned char *h;
+};
+
+static void *async_enc_secret_agreement(void *arg) {
+  struct async_enc_secret_agreement_arg *params = arg;
+
+  EphemeralSecretAgreement_B(params->ephemeralsk, params->pk, params->jinvariant);
+  OQS_SHA3_shake256(params->h, MSG_BYTES, params->jinvariant, FP2_ENCODED_BYTES);
+
+  return NULL;
+}
+
+int crypto_kem_enc_async(unsigned char *ct, unsigned char *ss, const unsigned char *pk)
+{ // SIKE's encapsulation using compression
+  // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
+  // Outputs: shared secret ss           (CRYPTO_BYTES bytes)
+  //          ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes)
+    unsigned char ephemeralsk[SECRETKEY_B_BYTES] = {0};
+    unsigned char jinvariant[FP2_ENCODED_BYTES] = {0};
+    unsigned char h[MSG_BYTES];
+    unsigned char temp[CRYPTO_CIPHERTEXTBYTES + MSG_BYTES] = {0};
+
+    // Generate ephemeralsk <- G(m||pk) mod oB 
+    OQS_randombytes(temp, MSG_BYTES);    
+    memcpy(&temp[MSG_BYTES], pk, CRYPTO_PUBLICKEYBYTES);        
+    OQS_SHA3_shake256(ephemeralsk, SECRETKEY_B_BYTES, temp, MSG_BYTES + CRYPTO_PUBLICKEYBYTES);
+    FormatPrivKey_B(ephemeralsk);
+    
+    // Encrypt
+    // EphemeralKeyGeneration_B_extended(ephemeralsk, ct, 1); 
+    // EphemeralSecretAgreement_B(ephemeralsk, pk, jinvariant);  
+    // OQS_SHA3_shake256(h, MSG_BYTES, jinvariant, FP2_ENCODED_BYTES);
+
+    pthread_t async_enc_keygen_b_th;
+    struct async_enc_keygen_b_arg arg1 = {ephemeralsk, ct};
+    if (pthread_create(&async_enc_keygen_b_th, NULL,
+                &async_enc_keygen_b, (void*)&arg1)) {
+        fprintf(stderr, "pthread_create() failed\n");
+        return 1;
+    }
+
+    pthread_t async_enc_secret_agreement_th;
+    struct async_enc_secret_agreement_arg arg2 = {ephemeralsk, pk, jinvariant, h};
+    if (pthread_create(&async_enc_secret_agreement_th, NULL,
+                &async_enc_secret_agreement, (void*)&arg2)) {
+
+      fprintf(stderr, "pthread_create() failed\n");
+      return 1;
+    }
+
+    if (pthread_join(async_enc_keygen_b_th, NULL) || pthread_join(async_enc_secret_agreement_th, NULL)) {
+      fprintf(stderr, "pthread_join() failed\n");
+      return 1;
+    }
+
+    for (int i = 0; i < MSG_BYTES; i++) {
+        ct[i + PARTIALLY_COMPRESSED_CHUNK_CT] = temp[i] ^ h[i];
+    }
+
+    // Generate shared secret ss <- H(m||ct)
+    memcpy(&temp[MSG_BYTES], ct, CRYPTO_CIPHERTEXTBYTES);      
+    OQS_SHA3_shake256(ss, CRYPTO_BYTES, temp, CRYPTO_CIPHERTEXTBYTES + MSG_BYTES);
+
+    return 0;
+}
 
 int crypto_kem_dec(unsigned char *ss, const unsigned char *ct, const unsigned char *sk)
 { // SIKE's decapsulation using compression 

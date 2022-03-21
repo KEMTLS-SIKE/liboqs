@@ -60,6 +60,7 @@ OQS_KEM *OQS_KEM_sike_p434_compressed_new() {
 	kem->keypair_async = OQS_KEM_sike_p434_compressed_keypair_async;
 	kem->keypair = OQS_KEM_sike_p434_compressed_keypair;
 	kem->encaps = OQS_KEM_sike_p434_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p434_compressed_encaps;
 	kem->decaps = OQS_KEM_sike_p434_compressed_decaps;
 
 	return kem;
@@ -123,6 +124,7 @@ OQS_KEM *OQS_KEM_sike_p503_compressed_new() {
 	kem->keypair_async = OQS_KEM_sike_p503_compressed_keypair_async;
 	kem->keypair = OQS_KEM_sike_p503_compressed_keypair;
 	kem->encaps = OQS_KEM_sike_p503_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p503_compressed_encaps;
 	kem->decaps = OQS_KEM_sike_p503_compressed_decaps;
 
 	return kem;
@@ -186,6 +188,7 @@ OQS_KEM *OQS_KEM_sike_p610_compressed_new() {
 	kem->keypair_async = OQS_KEM_sike_p610_compressed_keypair_async;
 	kem->keypair = OQS_KEM_sike_p610_compressed_keypair_async;
 	kem->encaps = OQS_KEM_sike_p610_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p610_compressed_encaps;
 	kem->decaps = OQS_KEM_sike_p610_compressed_decaps;
 
 	return kem;
@@ -249,6 +252,7 @@ OQS_KEM *OQS_KEM_sike_p751_compressed_new() {
 	kem->keypair_async = OQS_KEM_sike_p751_compressed_keypair_async;
 	kem->keypair = OQS_KEM_sike_p751_compressed_keypair;
 	kem->encaps = OQS_KEM_sike_p751_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p751_compressed_encaps;
 	kem->decaps = OQS_KEM_sike_p751_compressed_decaps;
 
 	return kem;

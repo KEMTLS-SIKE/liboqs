@@ -386,6 +386,7 @@ static const uint64_t v_3_torsion[TABLE_V3_LEN][2 * NWORDS64_FIELD] = {
 #define crypto_kem_async_batch_init OQS_KEM_sike_p610_compressed_async_init
 #define crypto_kem_keypair_async OQS_KEM_sike_p610_compressed_keypair_async
 #define crypto_kem_keypair OQS_KEM_sike_p610_compressed_keypair
+#define crypto_kem_enc_async OQS_KEM_sike_p610_compressed_encaps_async
 #define crypto_kem_enc OQS_KEM_sike_p610_compressed_encaps
 #define crypto_kem_dec OQS_KEM_sike_p610_compressed_decaps
 #define random_mod_order_A oqs_kem_sidh_p610_compressed_random_mod_order_A

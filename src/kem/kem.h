@@ -248,6 +248,7 @@ typedef struct OQS_KEM {
 	 * @return OQS_SUCCESS or OQS_ERROR
 	 */
 	OQS_STATUS (*encaps)(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
+	OQS_STATUS (*async_encaps)(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 
 	/**
 	 * Decapsulation algorithm.

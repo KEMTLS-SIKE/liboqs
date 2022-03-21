@@ -25,6 +25,7 @@ int OQS_KEM_sike_p751_compressed_keypair(unsigned char *pk, unsigned char *sk);
 // Outputs: shared secret ss      (CRYPTO_BYTES = 32 bytes)
 //          ciphertext message ct (CRYPTO_CIPHERTEXTBYTES = 410 bytes)
 int OQS_KEM_sike_p751_compressed_encaps(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
+int OQS_KEM_sike_p751_compressed_encaps_async(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
 
 // SIKE's decapsulation
 // Input:   secret key sk         (CRYPTO_SECRETKEYBYTES = 414 bytes)

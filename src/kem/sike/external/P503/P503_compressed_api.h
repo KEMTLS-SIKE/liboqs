@@ -24,6 +24,7 @@ int OQS_KEM_sike_p503_compressed_keypair(unsigned char *pk, unsigned char *sk);
 // Outputs: shared secret ss      (CRYPTO_BYTES = 24 bytes)
 //          ciphertext message ct (CRYPTO_CIPHERTEXTBYTES = 280 bytes)
 int OQS_KEM_sike_p503_compressed_encaps(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
+int OQS_KEM_sike_p503_compressed_encaps_async(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
 
 // SIKE's decapsulation
 // Input:   secret key sk         (CRYPTO_SECRETKEYBYTES = 407 bytes)

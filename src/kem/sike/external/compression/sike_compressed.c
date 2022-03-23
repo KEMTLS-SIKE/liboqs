@@ -87,21 +87,21 @@ void *async_enc_keygen_b(void *arg)
   return NULL;
 }
 
-struct async_enc_secret_agreement_arg {
-  unsigned char *ephemeralsk;
-  const unsigned char *pk;
-  unsigned char *jinvariant;
-  unsigned char *h;
-};
+// struct async_enc_secret_agreement_arg {
+//   unsigned char *ephemeralsk;
+//   const unsigned char *pk;
+//   unsigned char *jinvariant;
+//   unsigned char *h;
+// };
 
-static void *async_enc_secret_agreement(void *arg) {
-  struct async_enc_secret_agreement_arg *params = arg;
+// static void *async_enc_secret_agreement(void *arg) {
+//   struct async_enc_secret_agreement_arg *params = arg;
 
-  EphemeralSecretAgreement_B(params->ephemeralsk, params->pk, params->jinvariant);
-  OQS_SHA3_shake256(params->h, MSG_BYTES, params->jinvariant, FP2_ENCODED_BYTES);
+//   EphemeralSecretAgreement_B(params->ephemeralsk, params->pk, params->jinvariant);
+//   OQS_SHA3_shake256(params->h, MSG_BYTES, params->jinvariant, FP2_ENCODED_BYTES);
 
-  return NULL;
-}
+//   return NULL;
+// }
 
 int crypto_kem_enc_async(unsigned char *ct, unsigned char *ss, const unsigned char *pk)
 { // SIKE's encapsulation using compression
@@ -132,16 +132,18 @@ int crypto_kem_enc_async(unsigned char *ct, unsigned char *ss, const unsigned ch
         return 1;
     }
 
-    pthread_t async_enc_secret_agreement_th;
-    struct async_enc_secret_agreement_arg arg2 = {ephemeralsk, pk, jinvariant, h};
-    if (pthread_create(&async_enc_secret_agreement_th, NULL,
-                &async_enc_secret_agreement, (void*)&arg2)) {
+    // pthread_t async_enc_secret_agreement_th;
+    // struct async_enc_secret_agreement_arg arg2 = {ephemeralsk, pk, jinvariant, h};
+    // if (pthread_create(&async_enc_secret_agreement_th, NULL,
+    //             &async_enc_secret_agreement, (void*)&arg2)) {
 
-      fprintf(stderr, "pthread_create() failed\n");
-      return 1;
-    }
+    //   fprintf(stderr, "pthread_create() failed\n");
+    //   return 1;
+    // }
+    EphemeralSecretAgreement_B(ephemeralsk, pk, jinvariant);
+    OQS_SHA3_shake256(h, MSG_BYTES, jinvariant, FP2_ENCODED_BYTES);
 
-    if (pthread_join(async_enc_keygen_b_th, NULL) || pthread_join(async_enc_secret_agreement_th, NULL)) {
+    if (pthread_join(async_enc_keygen_b_th, NULL)) { // || pthread_join(async_enc_secret_agreement_th, NULL)) {
       fprintf(stderr, "pthread_join() failed\n");
       return 1;
     }

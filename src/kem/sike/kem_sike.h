@@ -32,9 +32,23 @@ OQS_KEM *OQS_KEM_sike_p434_compressed_new(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_async_deinit(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
-//OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
+
+#define OQS_KEM_sike_p434_1cca_compressed_length_public_key 197
+#define OQS_KEM_sike_p434_1cca_compressed_length_secret_key 350
+#define OQS_KEM_sike_p434_1cca_compressed_length_ciphertext 236
+#define OQS_KEM_sike_p434_1cca_compressed_length_shared_secret 16
+
+OQS_KEM *OQS_KEM_sike_p434_1cca_compressed_new(void);
+
+OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_async_init(void);
+OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_async_deinit(void);
+OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
 
 #endif
 

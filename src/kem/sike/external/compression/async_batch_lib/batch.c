@@ -42,7 +42,8 @@ static struct {
     int ref_count;
 
     BATCH_CTX *ctx;
-} crypto_kem_async_batch_global_ctx = {0, NULL};
+    BATCH_CTX *ctx_B;
+} crypto_kem_async_batch_global_ctx = {0, NULL, NULL};
 
 /* Returns 0 on success, 1 otherwise */
 static int crypto_kem_async_batch_keypair(unsigned char *pk,
@@ -62,10 +63,34 @@ static int crypto_kem_async_batch_keypair(unsigned char *pk,
   return 0;
 }
 
+static int crypto_kem_async_batch_keypair_B(unsigned char *ct,
+                                                   unsigned char *sk,
+                                                   unsigned n) {
+  unsigned i;
+
+  for (i = 0; i < n; i++) {
+    int ret;
+    random_mod_order_B(sk + i * SECRETKEY_B_BYTES);
+    ret = EphemeralKeyGeneration_B_extended(sk + i * SECRETKEY_B_BYTES,
+                             ct + i * CRYPTO_CIPHERTEXTBYTES, 0);
+    if (ret != 0) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 static inline
-int BATCH_STORE_fill(BATCH_STORE *store, size_t batch_size)
+int BATCH_STORE_fill(BATCH_STORE *store, size_t batch_size, int key_gen_b)
 {
-    int (*crypto_kem_batch_keygen_fn)(unsigned char *pk, unsigned char *sk, unsigned n) = crypto_kem_async_batch_keypair;
+    int (*crypto_kem_batch_keygen_fn)(unsigned char *pk, unsigned char *sk, unsigned n) = NULL;
+    if(key_gen_b == 0){
+      crypto_kem_batch_keygen_fn = crypto_kem_async_batch_keypair;
+    }
+    else{
+      crypto_kem_batch_keygen_fn = crypto_kem_async_batch_keypair_B;
+    }
     
     if (crypto_kem_batch_keygen_fn(store->pks, store->sks, batch_size) == 0) { // success
         store->available = batch_size;
@@ -75,14 +100,20 @@ int BATCH_STORE_fill(BATCH_STORE *store, size_t batch_size)
 }
 
 static inline
-BATCH_STORE *BATCH_STORE_new(size_t batch_size)
+BATCH_STORE *BATCH_STORE_new(size_t batch_size, int key_gen_b)
 {
     int ok = 0;
     BATCH_STORE *store = NULL;
     size_t data_size = 0, sks_len = 0, pks_len = 0;
 
-    pks_len = batch_size * CRYPTO_PUBLICKEYBYTES;
-    sks_len = batch_size * CRYPTO_SECRETKEYBYTES;
+    if(key_gen_b){
+    	pks_len = batch_size * CRYPTO_CIPHERTEXTBYTES;
+    	sks_len = batch_size * SECRETKEY_B_BYTES;
+    }
+    else{
+    	pks_len = batch_size * CRYPTO_PUBLICKEYBYTES;
+    	sks_len = batch_size * CRYPTO_SECRETKEYBYTES;
+    }
     data_size = pks_len + sks_len;
 
     if (data_size <= 0
@@ -120,7 +151,7 @@ void BATCH_STORE_free(BATCH_STORE *store)
 }
 
 static inline
-BATCH_CTX *BATCH_CTX_new(void)
+BATCH_CTX *BATCH_CTX_new(int key_gen_b)
 {
     int i;
     int ok = 0;
@@ -135,12 +166,13 @@ BATCH_CTX *BATCH_CTX_new(void)
     if (batch_size == 0)
         goto err;
 
+    ctx->key_gen_b = key_gen_b;
     if (pthread_mutex_init(&ctx->mutex, NULL)
             || pthread_cond_init(&ctx->emptied, NULL)
             || pthread_cond_init(&ctx->filled, NULL))
         goto err;
     for (i = 0; i < BATCH_STORE_N; i++) {
-        if (NULL == (ctx->stores[i] = BATCH_STORE_new(batch_size)))
+        if (NULL == (ctx->stores[i] = BATCH_STORE_new(batch_size, key_gen_b)))
             goto err;
     }
 
@@ -221,9 +253,9 @@ void BATCH_CTX_free(BATCH_CTX *ctx)
 }
 
 static inline
-int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp)
+int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp, int key_gen_b)
 {
-    int ret = 1;
+    int ret = 1, pk_bytes, sk_bytes;
     size_t i;
 
     if (store->available == 0) {
@@ -232,12 +264,21 @@ int BATCH_STORE_get_keypair(BATCH_STORE *store, KEM_KEYPAIR *kp)
     }
     i = --store->available;
 
-    memcpy(kp->pk, store->pks + i * CRYPTO_PUBLICKEYBYTES, CRYPTO_PUBLICKEYBYTES);
-    memcpy(kp->sk, store->sks + i * CRYPTO_SECRETKEYBYTES, CRYPTO_SECRETKEYBYTES);
+    if(key_gen_b){
+    	pk_bytes = CRYPTO_CIPHERTEXTBYTES;
+    	sk_bytes = SECRETKEY_B_BYTES;
+    }
+    else{
+    	pk_bytes = CRYPTO_PUBLICKEYBYTES;
+    	sk_bytes = CRYPTO_SECRETKEYBYTES;
+    }
+
+    memcpy(kp->pk, store->pks + i * pk_bytes, pk_bytes);
+    memcpy(kp->sk, store->sks + i * sk_bytes, sk_bytes);
 
     /* Erase keypair from buffer for PFS */
-    OQS_MEM_cleanse(store->sks + i * CRYPTO_SECRETKEYBYTES, CRYPTO_SECRETKEYBYTES);
-    OQS_MEM_cleanse(store->pks + i * CRYPTO_PUBLICKEYBYTES, CRYPTO_PUBLICKEYBYTES);
+    OQS_MEM_cleanse(store->sks + i * sk_bytes, sk_bytes);
+    OQS_MEM_cleanse(store->pks + i * pk_bytes, pk_bytes);
 
     if (store->available == 0) {
         /*
@@ -255,6 +296,7 @@ static inline
 int BATCH_CTX_get_keypair(BATCH_CTX *ctx, KEM_KEYPAIR *kp)
 {
     int ret = 1, r;
+    int key_gen_b = ctx->key_gen_b;
 
     pthread_mutex_lock(&ctx->mutex);
 
@@ -262,7 +304,7 @@ int BATCH_CTX_get_keypair(BATCH_CTX *ctx, KEM_KEYPAIR *kp)
         pthread_cond_wait(&ctx->filled, &ctx->mutex);
     }
 
-    r = BATCH_STORE_get_keypair(ctx->store, kp);
+    r = BATCH_STORE_get_keypair(ctx->store, kp, key_gen_b);
     if (r == -1) {
         /*
          * The store has been emptied.
@@ -296,7 +338,7 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
         return 1;
     }
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
-        ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();
+        ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new(0);
         if (ctx == NULL)
             return 1;
     } else {
@@ -313,9 +355,41 @@ int crypto_kem_async_batch_get_keypair(KEM_KEYPAIR *kp)
     return 0;
 }
 
+static
+int crypto_kem_async_batch_get_keypair_B(KEM_KEYPAIR *kp)
+{
+    BATCH_CTX *ctx = NULL;
+
+    int err;
+
+    /* This is always called only internally, assume kp is valid */
+
+    if ((err = pthread_mutex_lock(&global_mut)) != 0) {
+        //fprintf(stderr, "keypair %d", err);
+        return 1;
+    }
+    if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
+        ctx = crypto_kem_async_batch_global_ctx.ctx_B = BATCH_CTX_new(1);
+        if (ctx == NULL)
+            return 1;
+    } else {
+        ctx = crypto_kem_async_batch_global_ctx.ctx_B;
+    }
+    if (pthread_mutex_unlock(&global_mut) != 0) {
+        return 1;
+    }
+
+    if (BATCH_CTX_get_keypair(ctx, kp)) {
+        return 1;
+    }
+
+    return 0;
+}
+
 int crypto_kem_async_batch_init(void)
 {
     BATCH_CTX *ctx = NULL;
+    BATCH_CTX *ctx_B = NULL;
 
     if (pthread_mutex_lock(&global_mut) != 0) {
         return 1;
@@ -324,12 +398,11 @@ int crypto_kem_async_batch_init(void)
     crypto_kem_async_batch_global_ctx.ref_count++;
 
     if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
-        ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new();
-        if (ctx == NULL)
+        ctx = crypto_kem_async_batch_global_ctx.ctx = BATCH_CTX_new(0);
+        ctx_B = crypto_kem_async_batch_global_ctx.ctx_B = BATCH_CTX_new(1);
+        if (ctx == NULL || ctx_B == NULL)
             return 1;
-    } else {
-        ctx = crypto_kem_async_batch_global_ctx.ctx;
-    }
+    } 
 
     if (pthread_mutex_unlock(&global_mut) != 0) {
         return 1;
@@ -351,6 +424,7 @@ int crypto_kem_async_batch_deinit(void)
 
     // if (crypto_kem_async_batch_global_ctx.ref_count == 0) {
         BATCH_CTX_free(crypto_kem_async_batch_global_ctx.ctx);
+        BATCH_CTX_free(crypto_kem_async_batch_global_ctx.ctx_B);
         if (pthread_mutex_unlock(&global_mut) != 0) {
             return 1;
         }
@@ -368,6 +442,7 @@ int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
 {
     int ret = 1;
     int i, j;
+    int key_gen_b = ctx->key_gen_b;
     // int nid = ctx->nid_data->nid;
     //int nid = 0;
     size_t batch_size = ctx->batch_size;
@@ -402,7 +477,7 @@ int crypto_kem_async_batch_filler(BATCH_CTX *ctx)
         pthread_mutex_unlock(&ctx->mutex);
 
         for (--j; j >= 0; j--) {
-            if (BATCH_STORE_fill(q[j], batch_size)) {
+            if (BATCH_STORE_fill(q[j], batch_size, key_gen_b)) {
                 goto end;
             }
             q[j] = NULL;

@@ -51,6 +51,7 @@ struct batch_ctx_st {
     char destroy;
 
     BATCH_STORE *stores[BATCH_STORE_N];
+    int key_gen_b; 
 };
 
 struct batch_store_st {

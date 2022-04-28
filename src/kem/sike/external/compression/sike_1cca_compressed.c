@@ -107,7 +107,7 @@ void *async_enc_keygen_b(void *arg)
 //   return NULL;
 // }
 
-int crypto_kem_enc_async(unsigned char *ct, unsigned char *ss, const unsigned char *pk)
+int crypto_kem_enc_parallel(unsigned char *ct, unsigned char *ss, const unsigned char *pk)
 { // SIKE's encapsulation using compression
   // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
   // Outputs: shared secret ss           (CRYPTO_BYTES bytes)

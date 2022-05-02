@@ -141,22 +141,30 @@ extern "C" {
 #define OQS_KEM_alg_sike_p434 "SIKE-p434"
 /** Algorithm identifier for SIKE p434 compressed KEM. */
 #define OQS_KEM_alg_sike_p434_compressed "SIKE-p434-compressed"
+/** Algorithm identifier for SIKE p434 compressed KEM IND-1CCA. */
+#define OQS_KEM_alg_sike_p434_1cca_compressed "SIKE-p434-compressed-ind1cca"
 /** Algorithm identifier for SIKE p503 KEM. */
 #define OQS_KEM_alg_sike_p503 "SIKE-p503"
 /** Algorithm identifier for SIKE p503 compressed KEM. */
 #define OQS_KEM_alg_sike_p503_compressed "SIKE-p503-compressed"
+/** Algorithm identifier for SIKE p503 compressed KEM IND-1CCA. */
+#define OQS_KEM_alg_sike_p503_1cca_compressed "SIKE-p503-compressed-ind1cca"
 /** Algorithm identifier for SIKE p610 KEM. */
 #define OQS_KEM_alg_sike_p610 "SIKE-p610"
 /** Algorithm identifier for SIKE p610 compressed KEM. */
 #define OQS_KEM_alg_sike_p610_compressed "SIKE-p610-compressed"
+/** Algorithm identifier for SIKE p610 compressed KEM IND-1CCA. */
+#define OQS_KEM_alg_sike_p610_1cca_compressed "SIKE-p610-compressed-ind1cca"
 /** Algorithm identifier for SIKE p751 KEM. */
 #define OQS_KEM_alg_sike_p751 "SIKE-p751"
 /** Algorithm identifier for SIKE p751 compressed KEM. */
 #define OQS_KEM_alg_sike_p751_compressed "SIKE-p751-compressed"
+/** Algorithm identifier for SIKE p751 compressed KEM IND-1CCA. */
+#define OQS_KEM_alg_sike_p751_1cca_compressed "SIKE-p751-compressed-ind1cca"
 // EDIT-WHEN-ADDING-KEM
 ///// OQS_COPY_FROM_UPSTREAM_FRAGMENT_ALGS_LENGTH_START
 /** Number of algorithm identifiers above. */
-#define OQS_KEM_algs_length 60
+#define OQS_KEM_algs_length 64
 ///// OQS_COPY_FROM_UPSTREAM_FRAGMENT_ALGS_LENGTH_END
 
 /**

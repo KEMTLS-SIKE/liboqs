@@ -20,6 +20,11 @@ if(
    OQS_ENABLE_KEM_sike_p503_compressed OR
    OQS_ENABLE_KEM_sike_p610_compressed OR
    OQS_ENABLE_KEM_sike_p751_compressed OR
+   OQS_ENABLE_KEM_sike_p434_1cca_compressed OR
+   OQS_ENABLE_KEM_sike_p503_1cca_compressed OR
+   OQS_ENABLE_KEM_sike_p610_1cca_compressed OR
+   OQS_ENABLE_KEM_sike_p751_1cca_compressed OR
+
    OQS_ENABLE_KEM_sidh_p434 OR
    OQS_ENABLE_KEM_sidh_p503 OR
    OQS_ENABLE_KEM_sidh_p610 OR

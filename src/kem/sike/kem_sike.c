@@ -68,6 +68,40 @@ OQS_KEM *OQS_KEM_sike_p434_compressed_new() {
 
 #endif
 
+#ifdef OQS_ENABLE_KEM_sike_p434_1cca_compressed
+
+#include "external/P434/P434_1cca_compressed_api.h"
+
+OQS_KEM *OQS_KEM_sike_p434_1cca_compressed_new() {
+
+	OQS_KEM *kem = malloc(sizeof(OQS_KEM));
+	if (kem == NULL) {
+		return NULL;
+	}
+	kem->method_name = OQS_KEM_alg_sike_p434_1cca_compressed;
+	kem->alg_version = "https://github.com/microsoft/PQCrypto-SIDH/commit/effa607f244768cdd38f930887076373604eaa78";
+
+	kem->claimed_nist_level = 5;
+	kem->ind_cca = true;
+
+	kem->length_public_key = OQS_KEM_sike_p434_1cca_compressed_length_public_key;
+	kem->length_secret_key = OQS_KEM_sike_p434_1cca_compressed_length_secret_key;
+	kem->length_ciphertext = OQS_KEM_sike_p434_1cca_compressed_length_ciphertext;
+	kem->length_shared_secret = OQS_KEM_sike_p434_1cca_compressed_length_shared_secret;
+
+	kem->init = OQS_KEM_sike_p434_1cca_compressed_async_init;
+	kem->deinit = OQS_KEM_sike_p434_1cca_compressed_async_deinit;
+	kem->keypair_async = OQS_KEM_sike_p434_1cca_compressed_keypair_async;
+	kem->keypair = OQS_KEM_sike_p434_1cca_compressed_keypair;
+	kem->encaps = OQS_KEM_sike_p434_1cca_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p434_1cca_compressed_encaps_async;
+	kem->decaps = OQS_KEM_sike_p434_1cca_compressed_decaps;
+
+	return kem;
+}
+
+#endif
+
 #ifdef OQS_ENABLE_KEM_sike_p503
 
 #include "external/P503/P503_api.h"
@@ -126,6 +160,40 @@ OQS_KEM *OQS_KEM_sike_p503_compressed_new() {
 	kem->encaps = OQS_KEM_sike_p503_compressed_encaps;
 	kem->async_encaps = OQS_KEM_sike_p503_compressed_encaps_async;
 	kem->decaps = OQS_KEM_sike_p503_compressed_decaps;
+
+	return kem;
+}
+
+#endif
+
+#ifdef OQS_ENABLE_KEM_sike_p503_1cca_compressed
+
+#include "external/P503/P503_1cca_compressed_api.h"
+
+OQS_KEM *OQS_KEM_sike_p503_1cca_compressed_new() {
+
+	OQS_KEM *kem = malloc(sizeof(OQS_KEM));
+	if (kem == NULL) {
+		return NULL;
+	}
+	kem->method_name = OQS_KEM_alg_sike_p503_1cca_compressed;
+	kem->alg_version = "https://github.com/microsoft/PQCrypto-SIDH/commit/effa607f244768cdd38f930887076373604eaa78";
+
+	kem->claimed_nist_level = 5;
+	kem->ind_cca = true;
+
+	kem->length_public_key = OQS_KEM_sike_p503_1cca_compressed_length_public_key;
+	kem->length_secret_key = OQS_KEM_sike_p503_1cca_compressed_length_secret_key;
+	kem->length_ciphertext = OQS_KEM_sike_p503_1cca_compressed_length_ciphertext;
+	kem->length_shared_secret = OQS_KEM_sike_p503_1cca_compressed_length_shared_secret;
+
+	kem->init = OQS_KEM_sike_p503_1cca_compressed_async_init;
+	kem->deinit = OQS_KEM_sike_p503_1cca_compressed_async_deinit;
+	kem->keypair_async = OQS_KEM_sike_p503_1cca_compressed_keypair_async;
+	kem->keypair = OQS_KEM_sike_p503_1cca_compressed_keypair;
+	kem->encaps = OQS_KEM_sike_p503_1cca_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p503_1cca_compressed_encaps_async;
+	kem->decaps = OQS_KEM_sike_p503_1cca_compressed_decaps;
 
 	return kem;
 }
@@ -196,6 +264,41 @@ OQS_KEM *OQS_KEM_sike_p610_compressed_new() {
 
 #endif
 
+
+#ifdef OQS_ENABLE_KEM_sike_p610_1cca_compressed
+
+#include "external/P610/P610_1cca_compressed_api.h"
+
+OQS_KEM *OQS_KEM_sike_p610_1cca_compressed_new() {
+
+	OQS_KEM *kem = malloc(sizeof(OQS_KEM));
+	if (kem == NULL) {
+		return NULL;
+	}
+	kem->method_name = OQS_KEM_alg_sike_p610_1cca_compressed;
+	kem->alg_version = "https://github.com/microsoft/PQCrypto-SIDH/commit/effa607f244768cdd38f930887076373604eaa78";
+
+	kem->claimed_nist_level = 5;
+	kem->ind_cca = true;
+
+	kem->length_public_key = OQS_KEM_sike_p610_1cca_compressed_length_public_key;
+	kem->length_secret_key = OQS_KEM_sike_p610_1cca_compressed_length_secret_key;
+	kem->length_ciphertext = OQS_KEM_sike_p610_1cca_compressed_length_ciphertext;
+	kem->length_shared_secret = OQS_KEM_sike_p610_1cca_compressed_length_shared_secret;
+
+	kem->init = OQS_KEM_sike_p610_1cca_compressed_async_init;
+	kem->deinit = OQS_KEM_sike_p610_1cca_compressed_async_deinit;
+	kem->keypair_async = OQS_KEM_sike_p610_1cca_compressed_keypair_async;
+	kem->keypair = OQS_KEM_sike_p610_1cca_compressed_keypair;
+	kem->encaps = OQS_KEM_sike_p610_1cca_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p610_1cca_compressed_encaps_async;
+	kem->decaps = OQS_KEM_sike_p610_1cca_compressed_decaps;
+
+	return kem;
+}
+
+#endif
+
 #ifdef OQS_ENABLE_KEM_sike_p751
 
 #include "external/P751/P751_api.h"
@@ -254,6 +357,40 @@ OQS_KEM *OQS_KEM_sike_p751_compressed_new() {
 	kem->encaps = OQS_KEM_sike_p751_compressed_encaps;
 	kem->async_encaps = OQS_KEM_sike_p751_compressed_encaps_async;
 	kem->decaps = OQS_KEM_sike_p751_compressed_decaps;
+
+	return kem;
+}
+
+#endif
+
+#ifdef OQS_ENABLE_KEM_sike_p751_1cca_compressed
+
+#include "external/P751/P751_1cca_compressed_api.h"
+
+OQS_KEM *OQS_KEM_sike_p751_1cca_compressed_new() {
+
+	OQS_KEM *kem = malloc(sizeof(OQS_KEM));
+	if (kem == NULL) {
+		return NULL;
+	}
+	kem->method_name = OQS_KEM_alg_sike_p751_1cca_compressed;
+	kem->alg_version = "https://github.com/microsoft/PQCrypto-SIDH/commit/effa607f244768cdd38f930887076373604eaa78";
+
+	kem->claimed_nist_level = 5;
+	kem->ind_cca = true;
+
+	kem->length_public_key = OQS_KEM_sike_p751_1cca_compressed_length_public_key;
+	kem->length_secret_key = OQS_KEM_sike_p751_1cca_compressed_length_secret_key;
+	kem->length_ciphertext = OQS_KEM_sike_p751_1cca_compressed_length_ciphertext;
+	kem->length_shared_secret = OQS_KEM_sike_p751_1cca_compressed_length_shared_secret;
+
+	kem->init = OQS_KEM_sike_p751_1cca_compressed_async_init;
+	kem->deinit = OQS_KEM_sike_p751_1cca_compressed_async_deinit;
+	kem->keypair_async = OQS_KEM_sike_p751_1cca_compressed_keypair_async;
+	kem->keypair = OQS_KEM_sike_p751_1cca_compressed_keypair;
+	kem->encaps = OQS_KEM_sike_p751_1cca_compressed_encaps;
+	kem->async_encaps = OQS_KEM_sike_p751_1cca_compressed_encaps_async;
+	kem->decaps = OQS_KEM_sike_p751_1cca_compressed_decaps;
 
 	return kem;
 }

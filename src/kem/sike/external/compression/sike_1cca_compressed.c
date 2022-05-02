@@ -42,7 +42,7 @@ int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 
 
 int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk)
-{ // SIKE's encapsulation using compression
+{ // 1-CCA SIKE's encapsulation using compression
   // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
   // Outputs: shared secret ss           (CRYPTO_BYTES bytes)
   //          ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes)
@@ -51,23 +51,16 @@ int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk
   unsigned char temp[FP2_ENCODED_BYTES + PARTIALLY_COMPRESSED_CHUNK_CT] = {0};
   KEM_KEYPAIR kp;
 
-  //random_mod_order_B(ephemeralsk);
+  // Encrypt: generate an ephemeral keypair (a, g^a)
   kp.pk = ct;
   kp.sk = ephemeralsk;
 
-  //OQS_randombytes(ephemeralsk, MSG_BYTES);    
-
-  // Encrypt
   crypto_kem_async_batch_get_keypair_B(&kp);
-  /*
-  for(int i = 0; i < SECRETKEY_B_BYTES; i++)
-    printf("%0x", ephemeralsk[i]);
-  printf("\n");
-  */
-  //EphemeralKeyGeneration_B_extended(ephemeralsk, ct, 0); 
+
+  // Compute ephemeral shared secret with other peer g^{ab}
   EphemeralSecretAgreement_B(ephemeralsk, pk, jinvariant);  
 
-  // Generate shared secret ss <- H(m||ct)
+  // Generate shared secret ss <- H(g^{ab}||b)
   memcpy(temp, jinvariant, FP2_ENCODED_BYTES);
   memcpy(&temp[FP2_ENCODED_BYTES], ct, PARTIALLY_COMPRESSED_CHUNK_CT);      
   OQS_SHA3_shake256(ss, CRYPTO_BYTES, temp, PARTIALLY_COMPRESSED_CHUNK_CT + FP2_ENCODED_BYTES);
@@ -91,22 +84,6 @@ void *async_enc_keygen_b(void *arg)
   return NULL;
 }
 
-// struct async_enc_secret_agreement_arg {
-//   unsigned char *ephemeralsk;
-//   const unsigned char *pk;
-//   unsigned char *jinvariant;
-//   unsigned char *h;
-// };
-
-// static void *async_enc_secret_agreement(void *arg) {
-//   struct async_enc_secret_agreement_arg *params = arg;
-
-//   EphemeralSecretAgreement_B(params->ephemeralsk, params->pk, params->jinvariant);
-//   OQS_SHA3_shake256(params->h, MSG_BYTES, params->jinvariant, FP2_ENCODED_BYTES);
-
-//   return NULL;
-// }
-
 int crypto_kem_enc_parallel(unsigned char *ct, unsigned char *ss, const unsigned char *pk)
 { // SIKE's encapsulation using compression
   // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
@@ -119,11 +96,7 @@ int crypto_kem_enc_parallel(unsigned char *ct, unsigned char *ss, const unsigned
   // Generate ephemeralsk <- G(m||pk) mod oB 
   random_mod_order_B(ephemeralsk);
 
-  // Encrypt
-  // EphemeralKeyGeneration_B_extended(ephemeralsk, ct, 1); 
-  // EphemeralSecretAgreement_B(ephemeralsk, pk, jinvariant);  
-  // OQS_SHA3_shake256(h, MSG_BYTES, jinvariant, FP2_ENCODED_BYTES);
-
+  // Encrypt: generate an ephemeral keypair (a, g^a)
   pthread_t async_enc_keygen_b_th;
   struct async_enc_keygen_b_arg arg1 = {ephemeralsk, ct};
   if (pthread_create(&async_enc_keygen_b_th, NULL,
@@ -132,50 +105,40 @@ int crypto_kem_enc_parallel(unsigned char *ct, unsigned char *ss, const unsigned
     return 1;
   }
 
-  // pthread_t async_enc_secret_agreement_th;
-  // struct async_enc_secret_agreement_arg arg2 = {ephemeralsk, pk, jinvariant, h};
-  // if (pthread_create(&async_enc_secret_agreement_th, NULL,
-  //             &async_enc_secret_agreement, (void*)&arg2)) {
-
-  //   fprintf(stderr, "pthread_create() failed\n");
-  //   return 1;
-  // }
-  //EphemeralKeyGeneration_B_extended(ephemeralsk, ct, 0); 
+  // Compute ephemeral shared secret with other peer g^{ab}
   EphemeralSecretAgreement_B(ephemeralsk, pk, jinvariant);
-
   
   if (pthread_join(async_enc_keygen_b_th, NULL)) { // || pthread_join(async_enc_secret_agreement_th, NULL)) {
     fprintf(stderr, "pthread_join() failed\n");
     return 1;
   }
+
+  // Generate shared secret ss <- H(g^{ab}||b)
   memcpy(temp, jinvariant, FP2_ENCODED_BYTES);
   memcpy(&temp[FP2_ENCODED_BYTES], ct, PARTIALLY_COMPRESSED_CHUNK_CT);      
   OQS_SHA3_shake256(ss, CRYPTO_BYTES, temp, PARTIALLY_COMPRESSED_CHUNK_CT + FP2_ENCODED_BYTES);
 
-  // Generate shared secret ss <- H(m||ct)
   return 0;
-  }
+}
 
-  int crypto_kem_dec(unsigned char *ss, const unsigned char *ct, const unsigned char *sk)
-  { // SIKE's decapsulation using compression 
-    // Input:   secret key sk                         (CRYPTO_SECRETKEYBYTES = MSG_BYTES + SECRETKEY_A_BYTES + CRYPTO_PUBLICKEYBYTES + FP2_ENCODED_BYTES bytes)
-    //          compressed ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes) 
-    // Outputs: shared secret ss                      (CRYPTO_BYTES bytes)
-    unsigned char jinvariant_[FP2_ENCODED_BYTES + 2*FP2_ENCODED_BYTES + SECRETKEY_A_BYTES] = {0};
-    unsigned char temp[FP2_ENCODED_BYTES+PARTIALLY_COMPRESSED_CHUNK_CT] = {0};   
+int crypto_kem_dec(unsigned char *ss, const unsigned char *ct, const unsigned char *sk)
+{ // SIKE's decapsulation using compression 
+  // Input:   secret key sk                         (CRYPTO_SECRETKEYBYTES = MSG_BYTES + SECRETKEY_A_BYTES + CRYPTO_PUBLICKEYBYTES + FP2_ENCODED_BYTES bytes)
+  //          compressed ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes) 
+  // Outputs: shared secret ss                      (CRYPTO_BYTES bytes)
+  unsigned char jinvariant_[FP2_ENCODED_BYTES + 2*FP2_ENCODED_BYTES + SECRETKEY_A_BYTES] = {0};
+  unsigned char temp[FP2_ENCODED_BYTES+PARTIALLY_COMPRESSED_CHUNK_CT] = {0};
 
-    // Decrypt 
-    EphemeralSecretAgreement_A_extended(sk + MSG_BYTES, ct, jinvariant_, 0);  
-    //OQS_SHA3_shake256(h_, MSG_BYTES, jinvariant_, FP2_ENCODED_BYTES);   
+  // Decrypt: ct = g^b
+  // Compute ephemeral shared secret jinvariant_ = g^{ab} from g^b and a
+  EphemeralSecretAgreement_A_extended(sk + MSG_BYTES, ct, jinvariant_, 0);  
 
-    // Generate shared secret ss <- H(m||ct), or output ss <- H(s||ct) in case of ct verification failure
-    // No need to recompress, just check if x(phi(P) + t*phi(Q)) == x((a0 + t*a1)*R1 + (b0 + t*b1)*R2)    
-    //int8_t selector = 0;
-    // If ct validation passes (selector = 0) then do ss = H(m||ct), otherwise (selector = -1) load s to do ss = H(s||ct)
-    memcpy(temp, jinvariant_, FP2_ENCODED_BYTES);
-    memcpy(&temp[FP2_ENCODED_BYTES], ct, PARTIALLY_COMPRESSED_CHUNK_CT);
-    OQS_SHA3_shake256(ss, CRYPTO_BYTES, temp, PARTIALLY_COMPRESSED_CHUNK_CT + FP2_ENCODED_BYTES);
+  // Compute shared secret: H(g^{ab}||b) with jinvariant_ = g^{ab} and b retrieved from ciphertext
+  // No need to reencrypt as we provide only 1-CCA security
+  memcpy(temp, jinvariant_, FP2_ENCODED_BYTES);
+  memcpy(&temp[FP2_ENCODED_BYTES], ct, PARTIALLY_COMPRESSED_CHUNK_CT);
+  OQS_SHA3_shake256(ss, CRYPTO_BYTES, temp, PARTIALLY_COMPRESSED_CHUNK_CT + FP2_ENCODED_BYTES);
 
-    return 0;
-  }
+  return 0;
+}
 

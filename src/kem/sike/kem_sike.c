@@ -88,6 +88,7 @@ OQS_KEM *OQS_KEM_sike_p434_1cca_compressed_new() {
 	kem->length_secret_key = OQS_KEM_sike_p434_1cca_compressed_length_secret_key;
 	kem->length_ciphertext = OQS_KEM_sike_p434_1cca_compressed_length_ciphertext;
 	kem->length_shared_secret = OQS_KEM_sike_p434_1cca_compressed_length_shared_secret;
+	kem->length_ephemeral_secret = OQS_KEM_sike_p434_1cca_compressed_length_ephemeral_secret;
 
 	kem->init = OQS_KEM_sike_p434_1cca_compressed_async_init;
 	kem->deinit = OQS_KEM_sike_p434_1cca_compressed_async_deinit;
@@ -95,6 +96,8 @@ OQS_KEM *OQS_KEM_sike_p434_1cca_compressed_new() {
 	kem->keypair = OQS_KEM_sike_p434_1cca_compressed_keypair;
 	kem->encaps = OQS_KEM_sike_p434_1cca_compressed_encaps;
 	kem->async_encaps = OQS_KEM_sike_p434_1cca_compressed_encaps_async;
+	kem->encaps_ciphertext = OQS_KEM_sike_p434_1cca_compressed_encaps_ciphertext;
+	kem->encaps_shared_secret = OQS_KEM_sike_p434_1cca_compressed_encaps_shared_secret;
 	kem->decaps = OQS_KEM_sike_p434_1cca_compressed_decaps;
 
 	return kem;
@@ -186,6 +189,8 @@ OQS_KEM *OQS_KEM_sike_p503_1cca_compressed_new() {
 	kem->length_secret_key = OQS_KEM_sike_p503_1cca_compressed_length_secret_key;
 	kem->length_ciphertext = OQS_KEM_sike_p503_1cca_compressed_length_ciphertext;
 	kem->length_shared_secret = OQS_KEM_sike_p503_1cca_compressed_length_shared_secret;
+	kem->length_ephemeral_secret = OQS_KEM_sike_p503_1cca_compressed_length_ephemeral_secret;
+
 
 	kem->init = OQS_KEM_sike_p503_1cca_compressed_async_init;
 	kem->deinit = OQS_KEM_sike_p503_1cca_compressed_async_deinit;
@@ -193,6 +198,8 @@ OQS_KEM *OQS_KEM_sike_p503_1cca_compressed_new() {
 	kem->keypair = OQS_KEM_sike_p503_1cca_compressed_keypair;
 	kem->encaps = OQS_KEM_sike_p503_1cca_compressed_encaps;
 	kem->async_encaps = OQS_KEM_sike_p503_1cca_compressed_encaps_async;
+	kem->encaps_ciphertext = OQS_KEM_sike_p503_1cca_compressed_encaps_ciphertext;
+	kem->encaps_shared_secret = OQS_KEM_sike_p503_1cca_compressed_encaps_shared_secret;
 	kem->decaps = OQS_KEM_sike_p503_1cca_compressed_decaps;
 
 	return kem;
@@ -285,6 +292,8 @@ OQS_KEM *OQS_KEM_sike_p610_1cca_compressed_new() {
 	kem->length_secret_key = OQS_KEM_sike_p610_1cca_compressed_length_secret_key;
 	kem->length_ciphertext = OQS_KEM_sike_p610_1cca_compressed_length_ciphertext;
 	kem->length_shared_secret = OQS_KEM_sike_p610_1cca_compressed_length_shared_secret;
+	kem->length_ephemeral_secret = OQS_KEM_sike_p610_1cca_compressed_length_ephemeral_secret;
+
 
 	kem->init = OQS_KEM_sike_p610_1cca_compressed_async_init;
 	kem->deinit = OQS_KEM_sike_p610_1cca_compressed_async_deinit;
@@ -292,6 +301,8 @@ OQS_KEM *OQS_KEM_sike_p610_1cca_compressed_new() {
 	kem->keypair = OQS_KEM_sike_p610_1cca_compressed_keypair;
 	kem->encaps = OQS_KEM_sike_p610_1cca_compressed_encaps;
 	kem->async_encaps = OQS_KEM_sike_p610_1cca_compressed_encaps_async;
+	kem->encaps_ciphertext = OQS_KEM_sike_p610_1cca_compressed_encaps_ciphertext;
+	kem->encaps_shared_secret = OQS_KEM_sike_p610_1cca_compressed_encaps_shared_secret;
 	kem->decaps = OQS_KEM_sike_p610_1cca_compressed_decaps;
 
 	return kem;
@@ -383,6 +394,8 @@ OQS_KEM *OQS_KEM_sike_p751_1cca_compressed_new() {
 	kem->length_secret_key = OQS_KEM_sike_p751_1cca_compressed_length_secret_key;
 	kem->length_ciphertext = OQS_KEM_sike_p751_1cca_compressed_length_ciphertext;
 	kem->length_shared_secret = OQS_KEM_sike_p751_1cca_compressed_length_shared_secret;
+	kem->length_ephemeral_secret = OQS_KEM_sike_p751_1cca_compressed_length_ephemeral_secret;
+
 
 	kem->init = OQS_KEM_sike_p751_1cca_compressed_async_init;
 	kem->deinit = OQS_KEM_sike_p751_1cca_compressed_async_deinit;
@@ -390,6 +403,8 @@ OQS_KEM *OQS_KEM_sike_p751_1cca_compressed_new() {
 	kem->keypair = OQS_KEM_sike_p751_1cca_compressed_keypair;
 	kem->encaps = OQS_KEM_sike_p751_1cca_compressed_encaps;
 	kem->async_encaps = OQS_KEM_sike_p751_1cca_compressed_encaps_async;
+	kem->encaps_ciphertext = OQS_KEM_sike_p751_1cca_compressed_encaps_ciphertext;
+	kem->encaps_shared_secret = OQS_KEM_sike_p751_1cca_compressed_encaps_shared_secret;
 	kem->decaps = OQS_KEM_sike_p751_1cca_compressed_decaps;
 
 	return kem;

@@ -27,6 +27,9 @@ int OQS_KEM_sike_p610_1cca_compressed_keypair(unsigned char *pk, unsigned char *
 int OQS_KEM_sike_p610_1cca_compressed_encaps(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
 int OQS_KEM_sike_p610_1cca_compressed_encaps_async(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
 
+int OQS_KEM_sike_p610_1cca_compressed_encaps_ciphertext(unsigned char *ct, unsigned char *ephemeralsk, const unsigned char *pk);
+int OQS_KEM_sike_p610_1cca_compressed_shared_secret(unsigned char *ss, const unsigned char *ct, const char *ephemeralsk, const unsigned char *pk);
+
 // SIKE's decapsulation
 // Input:   secret key sk         (CRYPTO_SECRETKEYBYTES = 350 bytes)
 //          ciphertext message ct (CRYPTO_CIPHERTEXTBYTES = 236 bytes)

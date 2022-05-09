@@ -227,6 +227,9 @@ typedef struct OQS_KEM {
 	/** The (maximum) length, in bytes, of shared secrets for this KEM. */
 	size_t length_shared_secret;
 
+	/** The (maximum) length, in bytes, of ephemeral secrets for this KEM. */
+	size_t length_ephemeral_secret;
+
 	OQS_STATUS (*init)(void);
 	OQS_STATUS (*deinit)(void);
 	OQS_STATUS (*keypair_async)(uint8_t *public_key, uint8_t *secret_key);
@@ -257,6 +260,9 @@ typedef struct OQS_KEM {
 	 */
 	OQS_STATUS (*encaps)(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 	OQS_STATUS (*async_encaps)(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
+
+	OQS_STATUS (*encaps_ciphertext)(uint8_t *ciphertext, uint8_t *ephemeral_secret, const uint8_t *public_key);
+	OQS_STATUS (*encaps_shared_secret)(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *ephemeral_secret, const uint8_t *public_key);
 
 	/**
 	 * Decapsulation algorithm.

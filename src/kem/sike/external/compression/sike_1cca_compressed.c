@@ -68,6 +68,42 @@ int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk
   return 0;
 }
 
+int crypto_kem_enc_ciphertext(unsigned char *ct, unsigned char *ephemeralsk, [[maybe_unused]] const unsigned char *pk)
+{ // 1-CCA SIKE's encapsulation using compression
+  // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
+  // Outputs: ephemeral secret ss        (SECRETKEY_B_BYTES bytes)
+  //          ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes)
+  KEM_KEYPAIR kp;
+
+  // Encrypt: generate an ephemeral keypair (a, g^a)
+  kp.pk = ct;
+  kp.sk = ephemeralsk;
+
+  crypto_kem_async_batch_get_keypair_B(&kp);
+
+  return 0;
+}
+
+int crypto_kem_enc_shared_secret(unsigned char *ss, const unsigned char *ct, const char *ephemeralsk, const unsigned char *pk)
+{ // 1-CCA SIKE's encapsulation using compression
+  // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
+  //          ephemeral secret ss        (SECRETKEY_B_BYTES bytes)
+  //          ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes)
+  // Outputs: shared secret ss           (CRYPTO_BYTES bytes)
+  unsigned char jinvariant[FP2_ENCODED_BYTES] = {0};
+  unsigned char temp[FP2_ENCODED_BYTES + PARTIALLY_COMPRESSED_CHUNK_CT] = {0};
+
+  // Compute ephemeral shared secret with other peer g^{ab}
+  EphemeralSecretAgreement_B(ephemeralsk, pk, jinvariant);  
+
+  // Generate shared secret ss <- H(g^{ab}||b)
+  memcpy(temp, jinvariant, FP2_ENCODED_BYTES);
+  memcpy(&temp[FP2_ENCODED_BYTES], ct, PARTIALLY_COMPRESSED_CHUNK_CT);      
+  OQS_SHA3_shake256(ss, CRYPTO_BYTES, temp, PARTIALLY_COMPRESSED_CHUNK_CT + FP2_ENCODED_BYTES);
+
+  return 0;
+}
+
 struct async_enc_keygen_b_arg {
   unsigned char *ephemeralsk;
   unsigned char *ct;

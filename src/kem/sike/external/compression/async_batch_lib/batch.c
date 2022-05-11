@@ -368,7 +368,7 @@ int crypto_kem_async_batch_get_keypair_B(KEM_KEYPAIR *kp)
         //fprintf(stderr, "keypair %d", err);
         return 1;
     }
-    if (crypto_kem_async_batch_global_ctx.ctx == NULL) {
+    if (crypto_kem_async_batch_global_ctx.ctx_B == NULL) {
         ctx = crypto_kem_async_batch_global_ctx.ctx_B = BATCH_CTX_new(1);
         if (ctx == NULL)
             return 1;

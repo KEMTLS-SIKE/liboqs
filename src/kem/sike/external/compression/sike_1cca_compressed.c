@@ -68,11 +68,12 @@ int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk
   return 0;
 }
 
-int crypto_kem_enc_ciphertext(unsigned char *ct, unsigned char *ephemeralsk, [[maybe_unused]] const unsigned char *pk)
+int crypto_kem_enc_ciphertext(unsigned char *ct, unsigned char *ephemeralsk, const unsigned char* pk)
 { // 1-CCA SIKE's encapsulation using compression
   // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
   // Outputs: ephemeral secret ss        (SECRETKEY_B_BYTES bytes)
   //          ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes)
+  (void) pk;
   KEM_KEYPAIR kp;
 
   // Encrypt: generate an ephemeral keypair (a, g^a)

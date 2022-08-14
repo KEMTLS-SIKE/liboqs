@@ -9,6 +9,9 @@ add_subdirectory(common)
 set(KEM_OBJS "")
 set(SIG_OBJS "")
 
+add_subdirectory(kem/csidh)
+set(KEM_OBJS ${KEM_OBJS} $<TARGET_OBJECTS:csidh>)
+
 if(${OQS_ENABLE_KEM_BIKE})
     add_subdirectory(kem/bike)
     set(KEM_OBJS ${KEM_OBJS} ${BIKE_OBJS})

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+#include "oqs/kem.h"
 #include <assert.h>
 #include <stdlib.h>
 #if defined(_WIN32)
@@ -80,6 +81,7 @@ OQS_API const char *OQS_KEM_alg_identifier(size_t i) {
 		OQS_KEM_alg_sike_p503_1cca_compressed,
 		OQS_KEM_alg_sike_p610_1cca_compressed,
 		OQS_KEM_alg_sike_p751_1cca_compressed,
+		OQS_KEM_alg_csidh_p512,
 	};
 	if (i >= OQS_KEM_algs_length) {
 		return NULL;
@@ -481,6 +483,8 @@ OQS_API int OQS_KEM_alg_is_enabled(const char *method_name) {
 #else
 		return 0;
 #endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_csidh_p512)) {
+		return 1;
 		// EDIT-WHEN-ADDING-KEM
 	} else {
 		return 0;
@@ -877,6 +881,8 @@ OQS_API OQS_KEM *OQS_KEM_new(const char *method_name) {
 #else
 		return NULL;
 #endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_csidh_p512)) {
+		return OQS_KEM_csidh_p512_new();
 		// EDIT-WHEN-ADDING-KEM
 	} else {
 		return NULL;

@@ -161,10 +161,12 @@ extern "C" {
 #define OQS_KEM_alg_sike_p751_compressed "SIKE-p751-compressed"
 /** Algorithm identifier for SIKE p751 compressed KEM IND-1CCA. */
 #define OQS_KEM_alg_sike_p751_1cca_compressed "SIKE-p751-compressed-ind1cca"
+/** Algorithm identifier for CSIDH p512 KEM. */
+#define OQS_KEM_alg_csidh_p512 "CSIDH-p512"
 // EDIT-WHEN-ADDING-KEM
 ///// OQS_COPY_FROM_UPSTREAM_FRAGMENT_ALGS_LENGTH_START
 /** Number of algorithm identifiers above. */
-#define OQS_KEM_algs_length 64
+#define OQS_KEM_algs_length 65
 ///// OQS_COPY_FROM_UPSTREAM_FRAGMENT_ALGS_LENGTH_END
 
 /**
@@ -375,6 +377,8 @@ OQS_API void OQS_KEM_free(OQS_KEM *kem);
 #ifdef OQS_ENABLE_KEM_SIDH
 #include <oqs/kem_sike.h>
 #endif /* OQS_ENABLE_KEM_SIDH */
+#include <oqs/kem_csidh.h>
+
 // EDIT-WHEN-ADDING-KEM
 
 #if defined(__cplusplus)

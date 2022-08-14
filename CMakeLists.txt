@@ -132,6 +132,8 @@ set(PUBLIC_HEADERS ${PROJECT_SOURCE_DIR}/src/oqs.h
                    ${PROJECT_SOURCE_DIR}/src/kem/kem.h
                    ${PROJECT_SOURCE_DIR}/src/sig/sig.h)
 
+set(PUBLIC_HEADERS ${PUBLIC_HEADERS} ${PROJECT_SOURCE_DIR}/src/kem/csidh/kem_csidh.h)
+
 if(${OQS_ENABLE_KEM_BIKE})
     set(PUBLIC_HEADERS ${PUBLIC_HEADERS} ${PROJECT_SOURCE_DIR}/src/kem/bike/kem_bike.h)
 endif()

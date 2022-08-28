@@ -5,23 +5,12 @@
 *********************************************************************************************/ 
 
 #include <string.h>
+#include <stdio.h>
+#include <pthread.h>
 #include <unistd.h>
 #include <oqs/common.h>
 #include <oqs/sha3.h>
 
-#include "./async_batch_lib/batch.c"
-
-int crypto_kem_keypair_async(unsigned char *pk, unsigned char *sk)
-{
-  KEM_KEYPAIR kp;
-  kp.pk = pk;
-  kp.sk = sk;
-  //crypto_kem_async_batch_init();
-  //fprintf(stderr, "End INIT %d\n");
-  //sleep(1);
-  crypto_kem_async_batch_get_keypair(&kp);
-  return 0;
-}
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 { // SIKE's key generation using compression
   // Outputs: secret key sk (CRYPTO_SECRETKEYBYTES = MSG_BYTES + SECRETKEY_A_BYTES + CRYPTO_PUBLICKEYBYTES + FP2_ENCODED_BYTES bytes)
@@ -49,13 +38,9 @@ int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk
   unsigned char ephemeralsk[SECRETKEY_B_BYTES] = {0};
   unsigned char jinvariant[FP2_ENCODED_BYTES] = {0};
   unsigned char temp[FP2_ENCODED_BYTES + PARTIALLY_COMPRESSED_CHUNK_CT] = {0};
-  KEM_KEYPAIR kp;
 
   // Encrypt: generate an ephemeral keypair (a, g^a)
-  kp.pk = ct;
-  kp.sk = ephemeralsk;
-
-  crypto_kem_async_batch_get_keypair_B(&kp);
+  crypto_kem_enc_ciphertext(ct, ephemeralsk);
 
   // Compute ephemeral shared secret with other peer g^{ab}
   EphemeralSecretAgreement_B(ephemeralsk, pk, jinvariant);  
@@ -68,21 +53,17 @@ int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk
   return 0;
 }
 
-int crypto_kem_enc_ciphertext(unsigned char *ct, unsigned char *ephemeralsk, const unsigned char* pk)
+int crypto_kem_enc_ciphertext(unsigned char *ct, unsigned char *ephemeralsk)
 { // 1-CCA SIKE's encapsulation using compression
   // Input:   public key pk              (CRYPTO_PUBLICKEYBYTES bytes)
   // Outputs: ephemeral secret ss        (SECRETKEY_B_BYTES bytes)
   //          ciphertext message ct      (CRYPTO_CIPHERTEXTBYTES = PARTIALLY_COMPRESSED_CHUNK_CT + MSG_BYTES bytes)
-  (void) pk;
-  KEM_KEYPAIR kp;
 
-  // Encrypt: generate an ephemeral keypair (a, g^a)
-  kp.pk = ct;
-  kp.sk = ephemeralsk;
-
-  crypto_kem_async_batch_get_keypair_B(&kp);
-
-  return 0;
+  int ret;
+  random_mod_order_B(ephemeralsk);
+  ret = EphemeralKeyGeneration_B_extended(ephemeralsk, ct, 0);
+  
+  return ret;
 }
 
 int crypto_kem_enc_shared_secret(unsigned char *ss, const unsigned char *ct, const char *ephemeralsk, const unsigned char *pk)

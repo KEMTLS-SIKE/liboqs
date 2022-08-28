@@ -18,7 +18,7 @@ OQS_API OQS_STATUS OQS_KEM_csidh_p512_async_keypair(uint8_t *public_key, uint8_t
 OQS_API OQS_STATUS OQS_KEM_csidh_p512_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_csidh_p512_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_csidh_p512_encaps_async(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
-OQS_API OQS_STATUS OQS_KEM_csidh_p512_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret, const uint8_t *public_key);
+OQS_API OQS_STATUS OQS_KEM_csidh_p512_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret);
 OQS_API OQS_STATUS OQS_KEM_csidh_p512_encaps_shared_secret(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *ephemeral_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_csidh_p512_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
 

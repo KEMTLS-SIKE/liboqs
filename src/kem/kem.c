@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+#include "async_batch_lib/batch.h"
 #include "oqs/kem.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -886,6 +887,36 @@ OQS_API OQS_KEM *OQS_KEM_new(const char *method_name) {
 		// EDIT-WHEN-ADDING-KEM
 	} else {
 		return NULL;
+	}
+}
+
+OQS_API OQS_STATUS OQS_KEM_init(const OQS_KEM *kem) {
+	if (kem == NULL) {
+		return OQS_ERROR;
+	} else {
+		return crypto_kem_async_batch_init(kem);
+	}
+}
+
+OQS_API OQS_STATUS OQS_KEM_deinit(void) {
+	return crypto_kem_async_batch_deinit();
+}
+
+OQS_API OQS_STATUS OQS_KEM_async_keypair(const OQS_KEM *kem, uint8_t *public_key, uint8_t *secret_key) {
+	if (kem == NULL) {
+		return OQS_ERROR;
+	} else {
+		KEM_KEYPAIR kp = {public_key, secret_key};
+		return crypto_kem_async_batch_get_keypair(kem, &kp);
+	}
+}
+
+OQS_API OQS_STATUS OQS_KEM_encaps_ciphertext(const OQS_KEM *kem, uint8_t *ciphertext, uint8_t *ephemeral_secret) {
+	if (kem == NULL) {
+		return OQS_ERROR;
+	} else {
+		KEM_KEYPAIR kp = {ciphertext, ephemeral_secret};
+		return crypto_kem_async_batch_get_keypair_B(kem, &kp);
 	}
 }
 

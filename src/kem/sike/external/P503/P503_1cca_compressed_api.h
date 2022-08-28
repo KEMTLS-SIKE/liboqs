@@ -13,7 +13,6 @@
 
 int OQS_KEM_sike_p503_1cca_compressed_async_init(void);
 int OQS_KEM_sike_p503_1cca_compressed_async_deinit(void);
-int OQS_KEM_sike_p503_1cca_compressed_keypair_async(unsigned char *pk, unsigned char *sk);
 // SIKE's key generation
 // It produces a private key sk and computes the public key pk.
 // Outputs: secret key sk (CRYPTO_SECRETKEYBYTES = 350 bytes)
@@ -27,7 +26,7 @@ int OQS_KEM_sike_p503_1cca_compressed_keypair(unsigned char *pk, unsigned char *
 int OQS_KEM_sike_p503_1cca_compressed_encaps(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
 int OQS_KEM_sike_p503_1cca_compressed_encaps_async(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
 
-int OQS_KEM_sike_p503_1cca_compressed_encaps_ciphertext(unsigned char *ct, unsigned char *ephemeralsk, const unsigned char *pk);
+int OQS_KEM_sike_p503_1cca_compressed_encaps_ciphertext(unsigned char *ct, unsigned char *ephemeralsk);
 int OQS_KEM_sike_p503_1cca_compressed_shared_secret(unsigned char *ss, const unsigned char *ct, const char *ephemeralsk, const unsigned char *pk);
 
 // SIKE's decapsulation

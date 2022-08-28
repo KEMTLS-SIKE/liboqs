@@ -25,6 +25,7 @@ OQS_KEM *OQS_KEM_frodokem_976_shake_new() {
 
 	kem->keypair = OQS_KEM_frodokem_976_shake_keypair;
 	kem->encaps = OQS_KEM_frodokem_976_shake_encaps;
+	kem->encaps_ciphertext = NULL;
 	kem->decaps = OQS_KEM_frodokem_976_shake_decaps;
 
 	return kem;

@@ -5,22 +5,12 @@
 *********************************************************************************************/ 
 
 #include <string.h>
+#include <stdio.h>
+#include <pthread.h>
 #include <unistd.h>
 #include <oqs/common.h>
 #include <oqs/sha3.h>
 
-#include "./async_batch_lib/batch.c"
-int crypto_kem_keypair_async(unsigned char *pk, unsigned char *sk)
-{
-  KEM_KEYPAIR kp;
-  kp.pk = pk;
-  kp.sk = sk;
-  //crypto_kem_async_batch_init();
-  //fprintf(stderr, "End INIT %d\n");
-  //sleep(1);
-  crypto_kem_async_batch_get_keypair(&kp);
-  return 0;
-}
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 { // SIKE's key generation using compression
   // Outputs: secret key sk (CRYPTO_SECRETKEYBYTES = MSG_BYTES + SECRETKEY_A_BYTES + CRYPTO_PUBLICKEYBYTES + FP2_ENCODED_BYTES bytes)

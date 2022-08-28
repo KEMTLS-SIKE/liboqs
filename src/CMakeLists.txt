@@ -71,7 +71,7 @@ if(OQS_ENABLE_SIG_SPHINCS)
 endif()
 ##### OQS_COPY_FROM_UPSTREAM_FRAGMENT_ADD_ALG_OBJECTS_END
 
-add_library(oqs kem/kem.c
+add_library(oqs kem/kem.c kem/async_batch_lib/batch.c
                 ${KEM_OBJS}
                 sig/sig.c
                 ${SIG_OBJS}

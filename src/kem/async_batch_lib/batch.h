@@ -25,6 +25,8 @@
 #include <pthread.h>
 #include <openssl/crypto.h>
 
+#include <oqs/kem.h>
+
 typedef struct batch_ctx_st BATCH_CTX;
 typedef struct batch_store_st BATCH_STORE;
 typedef struct kem_keypair KEM_KEYPAIR;
@@ -50,6 +52,12 @@ struct batch_ctx_st {
     char destroy;
 
     BATCH_STORE *stores[BATCH_STORE_N];
+
+    // KEM name, used as unique identifier to fail in case batch key generation is initiated with one kem, then called with another
+	const char *method_name;
+    int (*crypto_keypair) (unsigned char *pk, unsigned char *sk);
+    int publickey_size;
+    int privatekey_size;
 };
 
 struct batch_store_st {
@@ -61,6 +69,11 @@ struct batch_store_st {
 
     unsigned char _data[];
 };
+
+int crypto_kem_async_batch_init(const OQS_KEM* kem);
+int crypto_kem_async_batch_deinit(void);
+int crypto_kem_async_batch_get_keypair(const OQS_KEM* kem, KEM_KEYPAIR *kp);
+int crypto_kem_async_batch_get_keypair_B(const OQS_KEM* kem, KEM_KEYPAIR *kp);
 
 #endif /* !defined(PROVIDER_BATCH_H) */
 

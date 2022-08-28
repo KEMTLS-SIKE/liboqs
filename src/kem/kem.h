@@ -232,20 +232,18 @@ typedef struct OQS_KEM {
 	/** The (maximum) length, in bytes, of ephemeral secrets for this KEM. */
 	size_t length_ephemeral_secret;
 
-	OQS_STATUS (*init)(void);
-	OQS_STATUS (*deinit)(void);
-	OQS_STATUS (*keypair_async)(uint8_t *public_key, uint8_t *secret_key);
 	/**
-	 * Keypair generation algorithm.
-	 *
-	 * Caller is responsible for allocating sufficient memory for `public_key` and
-	 * `secret_key`, based on the `length_*` members in this object or the per-scheme
-	 * compile-time macros `OQS_KEM_*_length_*`.
-	 *
-	 * @param[out] public_key The public key represented as a byte string.
-	 * @param[out] secret_key The secret key represented as a byte string.
-	 * @return OQS_SUCCESS or OQS_ERROR
-	 */
+	* Keypair generation algorithm.
+	*
+	* Caller is responsible for allocating sufficient memory for
+	* `public_key` and `secret_key`, based on the `length_*` members in
+	* this object or the per-scheme compile-time macros
+	* `OQS_KEM_*_length_*`.
+	*
+	* @param[out] public_key The public key represented as a byte string.
+	* @param[out] secret_key The secret key represented as a byte string.
+	* @return OQS_SUCCESS orBATCH_CTX_new OQS_ERROR
+	*/
 	OQS_STATUS (*keypair)(uint8_t *public_key, uint8_t *secret_key);
 
 	/**
@@ -263,7 +261,7 @@ typedef struct OQS_KEM {
 	OQS_STATUS (*encaps)(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 	OQS_STATUS (*async_encaps)(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 
-	OQS_STATUS (*encaps_ciphertext)(uint8_t *ciphertext, uint8_t *ephemeral_secret, const uint8_t *public_key);
+	OQS_STATUS (*encaps_ciphertext)(uint8_t *ciphertext, uint8_t *ephemeral_secret);
 	OQS_STATUS (*encaps_shared_secret)(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *ephemeral_secret, const uint8_t *public_key);
 
 	/**
@@ -292,6 +290,26 @@ typedef struct OQS_KEM {
  * @return An OQS_KEM for the particular algorithm, or `NULL` if the algorithm has been disabled at compile-time.
  */
 OQS_API OQS_KEM *OQS_KEM_new(const char *method_name);
+
+/**
+ * Initialize structures to produce keypairs asynchronously.
+ */
+OQS_API OQS_STATUS OQS_KEM_init(const OQS_KEM *kem);
+
+/**
+ * Deinitialize structures to produce keypairs asynchronously.
+ */
+OQS_API OQS_STATUS OQS_KEM_deinit(void);
+
+/**
+ * Async keypair generation algorithm.
+ */
+OQS_API OQS_STATUS OQS_KEM_async_keypair(const OQS_KEM *kem, uint8_t *public_key, uint8_t *secret_key);
+
+/**
+ * Async generation of encaps ciphertext.
+ */
+OQS_API OQS_STATUS OQS_KEM_encaps_ciphertext(const OQS_KEM *kem, uint8_t *ciphertext, uint8_t *ephemeral_secret);
 
 /**
  * Keypair generation algorithm.
@@ -372,7 +390,6 @@ OQS_API void OQS_KEM_free(OQS_KEM *kem);
 #endif /* OQS_ENABLE_KEM_FRODOKEM */
 #ifdef OQS_ENABLE_KEM_SIKE
 #include <oqs/kem_sike.h>
-#include <oqs/kem_sike_deinit.h>
 #endif /* OQS_ENABLE_KEM_SIKE */
 #ifdef OQS_ENABLE_KEM_SIDH
 #include <oqs/kem_sike.h>

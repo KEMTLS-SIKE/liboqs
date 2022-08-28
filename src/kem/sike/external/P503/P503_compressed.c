@@ -392,9 +392,6 @@ static const uint64_t v_3_torsion[TABLE_V3_LEN][2 * NWORDS64_FIELD] = {
 #define mp_add_asm oqs_kem_sike_mp_add503_asm
 #define mp_subaddx2_asm oqs_kem_sike_mp_subadd503x2_asm
 #define mp_dblsubx2_asm oqs_kem_sike_mp_dblsub503x2_asm
-#define crypto_kem_async_batch_deinit OQS_KEM_sike_p503_compressed_async_deinit
-#define crypto_kem_async_batch_init OQS_KEM_sike_p503_compressed_async_init
-#define crypto_kem_keypair_async OQS_KEM_sike_p503_compressed_keypair_async
 #define crypto_kem_keypair OQS_KEM_sike_p503_compressed_keypair
 #define crypto_kem_enc_async OQS_KEM_sike_p503_compressed_encaps_async
 #define crypto_kem_enc OQS_KEM_sike_p503_compressed_encaps

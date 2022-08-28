@@ -31,7 +31,6 @@ OQS_KEM *OQS_KEM_sike_p434_compressed_new(void);
 
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_async_deinit(void);
-OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
@@ -46,11 +45,10 @@ OQS_KEM *OQS_KEM_sike_p434_1cca_compressed_new(void);
 
 OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_async_deinit(void);
-OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_encaps_async(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
-OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret, const uint8_t *public_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_encaps_shared_secret(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *ephemeral_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p434_1cca_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
 
@@ -96,11 +94,10 @@ OQS_KEM *OQS_KEM_sike_p503_1cca_compressed_new(void);
 
 OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_async_deinit(void);
-OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_encaps_async(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
-OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret, const uint8_t *public_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret);
 OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_encaps_shared_secret(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *ephemeral_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p503_1cca_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
 #endif
@@ -132,7 +129,6 @@ OQS_KEM *OQS_KEM_sike_p610_compressed_new(void);
 
 OQS_API OQS_STATUS OQS_KEM_sike_p610_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_compressed_async_deinit(void);
-OQS_API OQS_STATUS OQS_KEM_sike_p610_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
@@ -146,11 +142,10 @@ OQS_KEM *OQS_KEM_sike_p610_1cca_compressed_new(void);
 
 OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_async_deinit(void);
-OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_encaps_async(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
-OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret, const uint8_t *public_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_encaps_shared_secret(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *ephemeral_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p610_1cca_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
 #endif
@@ -182,7 +177,6 @@ OQS_KEM *OQS_KEM_sike_p751_compressed_new(void);
 
 OQS_API OQS_STATUS OQS_KEM_sike_p751_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_compressed_async_deinit(void);
-OQS_API OQS_STATUS OQS_KEM_sike_p751_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
@@ -196,11 +190,10 @@ OQS_KEM *OQS_KEM_sike_p751_1cca_compressed_new(void);
 
 OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_async_init(void);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_async_deinit(void);
-OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_keypair_async(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_keypair(uint8_t *public_key, uint8_t *secret_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_encaps(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_encaps_async(uint8_t *ciphertext, uint8_t *shared_secret, const uint8_t *public_key);
-OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret, const uint8_t *public_key);
+OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_encaps_ciphertext(uint8_t *ciphertext, uint8_t *ephemeral_secret);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_encaps_shared_secret(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *ephemeral_secret, const uint8_t *public_key);
 OQS_API OQS_STATUS OQS_KEM_sike_p751_1cca_compressed_decaps(uint8_t *shared_secret, const uint8_t *ciphertext, const uint8_t *secret_key);
 #endif

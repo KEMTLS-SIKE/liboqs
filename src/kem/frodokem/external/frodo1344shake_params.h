@@ -28,6 +28,7 @@
 #define crypto_kem_keypair            OQS_KEM_frodokem_1344_shake_keypair
 #define crypto_kem_enc                OQS_KEM_frodokem_1344_shake_encaps
 #define crypto_kem_dec                OQS_KEM_frodokem_1344_shake_decaps
+#define crypto_kem_dec_1cca           OQS_KEM_frodokem_1344_shake_decaps_1cca
 
 #define frodo_sample_n oqs_kem_frodokem_1344_shake_sample_n
 #define frodo_pack oqs_kem_frodokem_1344_shake_pack

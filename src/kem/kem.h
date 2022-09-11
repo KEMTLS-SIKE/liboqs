@@ -121,6 +121,18 @@ extern "C" {
 #define OQS_KEM_alg_frodokem_1344_aes "FrodoKEM-1344-AES"
 /** Algorithm identifier for FrodoKEM-1344-SHAKE KEM. */
 #define OQS_KEM_alg_frodokem_1344_shake "FrodoKEM-1344-SHAKE"
+/** Algorithm identifier for FrodoKEM-640-AES KEM. */
+#define OQS_KEM_alg_frodokem_640_aes_1cca "FrodoKEM-640-AES-1CCA"
+/** Algorithm identifier for FrodoKEM-640-SHAKE KEM. */
+#define OQS_KEM_alg_frodokem_640_shake_1cca "FrodoKEM-640-SHAKE-1CCA"
+/** Algorithm identifier for FrodoKEM-976-AES KEM. */
+#define OQS_KEM_alg_frodokem_976_aes_1cca "FrodoKEM-976-AES-1CCA"
+/** Algorithm identifier for FrodoKEM-976-SHAKE KEM. */
+#define OQS_KEM_alg_frodokem_976_shake_1cca "FrodoKEM-976-SHAKE-1CCA"
+/** Algorithm identifier for FrodoKEM-1344-AES KEM. */
+#define OQS_KEM_alg_frodokem_1344_aes_1cca "FrodoKEM-1344-AES-1CCA"
+/** Algorithm identifier for FrodoKEM-1344-SHAKE KEM. */
+#define OQS_KEM_alg_frodokem_1344_shake_1cca "FrodoKEM-1344-SHAKE-1CCA"
 /** Algorithm identifier for SIDH p434 KEM. */
 #define OQS_KEM_alg_sidh_p434 "SIDH-p434"
 /** Algorithm identifier for SIDH p434 compressed KEM. */

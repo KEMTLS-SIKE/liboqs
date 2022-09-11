@@ -62,6 +62,12 @@ OQS_API const char *OQS_KEM_alg_identifier(size_t i) {
 		OQS_KEM_alg_frodokem_976_shake,
 		OQS_KEM_alg_frodokem_1344_aes,
 		OQS_KEM_alg_frodokem_1344_shake,
+		OQS_KEM_alg_frodokem_640_aes_1cca,
+		OQS_KEM_alg_frodokem_640_shake_1cca,
+		OQS_KEM_alg_frodokem_976_aes_1cca,
+		OQS_KEM_alg_frodokem_976_shake_1cca,
+		OQS_KEM_alg_frodokem_1344_aes_1cca,
+		OQS_KEM_alg_frodokem_1344_shake_1cca,
 		OQS_KEM_alg_sidh_p434,
 		OQS_KEM_alg_sidh_p503,
 		OQS_KEM_alg_sidh_p610,
@@ -359,6 +365,42 @@ OQS_API int OQS_KEM_alg_is_enabled(const char *method_name) {
 		return 0;
 #endif
 	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_1344_shake)) {
+#ifdef OQS_ENABLE_KEM_frodokem_1344_shake
+		return 1;
+#else
+		return 0;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_640_aes_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_640_aes
+		return 1;
+#else
+		return 0;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_640_shake_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_640_shake
+		return 1;
+#else
+		return 0;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_976_aes_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_976_aes
+		return 1;
+#else
+		return 0;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_976_shake_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_976_shake
+		return 1;
+#else
+		return 0;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_1344_aes_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_1344_aes
+		return 1;
+#else
+		return 0;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_1344_shake_1cca)) {
 #ifdef OQS_ENABLE_KEM_frodokem_1344_shake
 		return 1;
 #else
@@ -759,6 +801,42 @@ OQS_API OQS_KEM *OQS_KEM_new(const char *method_name) {
 	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_1344_shake)) {
 #ifdef OQS_ENABLE_KEM_frodokem_1344_shake
 		return OQS_KEM_frodokem_1344_shake_new();
+#else
+		return NULL;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_640_aes_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_640_aes
+		return OQS_KEM_frodokem_640_aes_1cca_new();
+#else
+		return NULL;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_640_shake_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_640_shake
+		return OQS_KEM_frodokem_640_shake_1cca_new();
+#else
+		return NULL;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_976_aes_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_976_aes
+		return OQS_KEM_frodokem_976_aes_1cca_new();
+#else
+		return NULL;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_976_shake_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_976_shake
+		return OQS_KEM_frodokem_976_shake_1cca_new();
+#else
+		return NULL;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_1344_aes_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_1344_aes
+		return OQS_KEM_frodokem_1344_aes_1cca_new();
+#else
+		return NULL;
+#endif
+	} else if (0 == strcasecmp(method_name, OQS_KEM_alg_frodokem_1344_shake_1cca)) {
+#ifdef OQS_ENABLE_KEM_frodokem_1344_shake
+		return OQS_KEM_frodokem_1344_shake_1cca_new();
 #else
 		return NULL;
 #endif

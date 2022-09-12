@@ -27,8 +27,8 @@
 
 #define crypto_kem_keypair            OQS_KEM_frodokem_640_aes_keypair
 #define crypto_kem_enc                OQS_KEM_frodokem_640_aes_encaps
-#define crypto_kem_dec                OQS_KEM_frodokem_640_aes_decaps
 #define crypto_kem_dec_1cca           OQS_KEM_frodokem_640_aes_decaps_1cca
+#define crypto_kem_dec                OQS_KEM_frodokem_640_aes_decaps
 
 #define frodo_sample_n oqs_kem_frodokem_640_aes_sample_n
 #define frodo_pack oqs_kem_frodokem_640_aes_pack

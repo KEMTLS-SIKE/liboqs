@@ -1,6 +1,3 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
-
 extern const uint64_t pbits;
 extern const uint p;
 extern const uint p_cofactor;
@@ -15,5 +12,3 @@ extern const uint four_sqrt_p;
 extern const fp first_elligator_rand;
 
 extern const unsigned cost_ratio_inv_mul;
-
-#endif

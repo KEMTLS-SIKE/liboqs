@@ -1,6 +1,3 @@
-#ifndef PARAMS_H
-#define PARAMS_H
-
 #include <stdint.h>
 
 #define LIMBS 8
@@ -21,5 +18,3 @@ static const unsigned primes[NUM_PRIMES] = {
 };
 
 #include "../constants.h"
-
-#endif

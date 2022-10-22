@@ -3,7 +3,11 @@
 #include <string.h>
 #include <assert.h>
 
-#include "external/p512/params.h"
+#ifdef CSIDH_1024
+    #include "p1024/params.h"
+#else
+    #include "p512/params.h"
+#endif
 #include "external/uint.h"
 #include "external/fp.h"
 

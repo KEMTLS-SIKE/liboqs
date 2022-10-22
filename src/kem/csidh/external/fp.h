@@ -1,6 +1,3 @@
-#ifndef FP_H
-#define FP_H
-
 #include <stdbool.h>
 
 #include "p512/params.h"
@@ -29,5 +26,3 @@ void fp_inv(fp *x);
 bool fp_issquare(fp *x); /* destroys input! */
 
 void fp_random(fp *x);
-
-#endif

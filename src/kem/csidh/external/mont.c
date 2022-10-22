@@ -2,7 +2,11 @@
 #include <string.h>
 #include <assert.h>
 
-#include "p512/params.h"
+#ifdef CSIDH_1024
+    #include "p1024/params.h"
+#else
+    #include "p512/params.h"
+#endif
 #include "uint.h"
 #include "fp.h"
 #include "mont.h"

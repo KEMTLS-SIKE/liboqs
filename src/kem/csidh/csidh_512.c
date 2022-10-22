@@ -1,14 +1,95 @@
-// SPDX-License-Identifier: MIT
-
-#include <stdlib.h>
 #include <pthread.h>
-
 #include <oqs/kem_csidh.h>
-
-#include "external/csidh.h"
-#include "external/p512/params.h"
 #include "oqs/common.h"
 
+// int.h
+#undef uint_0
+#undef uint_1
+#undef uint_eq
+#undef uint_set
+#undef uint_len
+#undef uint_bit
+#undef uint_add3
+#undef uint_sub3
+#undef uint_mul3_64
+#undef uint_eq
+#undef uint_random
+
+// mont.h
+#undef is_infinity
+#undef is_affine
+#undef affinize
+#undef xDBL
+#undef xADD
+#undef xDBLADD
+#undef xMUL
+#undef xISOG
+#undef is_twist
+#undef xmul_counters
+#undef isog_counters
+
+// fp.h
+#undef fp_0
+#undef fp_0
+#undef fp_eq
+#undef fp_set
+#undef fp_enc
+#undef fp_dec
+#undef fp_add2
+#undef fp_sub2
+#undef fp_mul2
+#undef fp_add3
+#undef fp_sub3
+#undef fp_mul3
+#undef fp_sq1
+#undef fp_sq2
+#undef fp_inv
+#undef fp_issquare
+#undef fp_random
+
+#undef fp_mul_counter
+#undef fp_sq_counter
+#undef fp_inv_counter
+#undef fp_sqt_counter
+
+// csidh.h
+#undef private_key
+#undef public_key
+#undef base
+#undef csidh_private
+#undef csidh
+#undef validate_basic
+
+// constants.h
+#undef pbits
+#undef p
+#undef p_cofactor
+#undef r_squared_mod_p
+#undef inv_min_p_mod_r
+#undef p_minus_2
+#undef p_minus_1_halves
+#undef four_sqrt_p
+#undef first_elligator_rand
+#undef cost_ratio_inv_mul
+
+// params.h
+#undef uint
+#undef fp
+#undef proj
+
+#include "external/mont.c"
+#include "external/csidh.c"
+#include "external/p512/constants.h"
+
+// external/p512/*.s files are included from CMakeLists.txt
+
+// set(SRCS ${SRCS} external/p512/uint.s)
+// set(SRCS ${SRCS} external/p512/fp.s external/p512/inv/fpadd511.s external/p512/inv/fpcneg511.s external/p512/inv/fpinv511.c external/p512/inv/fpmul2x2_511_half.c external/p512/inv/fpmul511.s external/p512/inv/jump64divsteps2_s511.s external/p512/inv/muls64xs64.s external/p512/inv/muls128xs128.s external/p512/inv/muls256xs256.s external/p512/inv/norm500_511.s)
+// set(SRCS ${SRCS} external/p512/constants.c)
+
+
+
+/* Forward KEM API calls to SIDH's API */
 
 OQS_KEM *OQS_KEM_csidh_p512_new(void) {
 
@@ -37,8 +118,6 @@ OQS_KEM *OQS_KEM_csidh_p512_new(void) {
 
 	return kem;
 }
-
-/* Forward KEM API calls to SIDH's API */
 
 OQS_API OQS_STATUS OQS_KEM_csidh_p512_keypair(uint8_t *pkey, uint8_t *skey) {
 	csidh_private((private_key*) skey);

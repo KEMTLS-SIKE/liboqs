@@ -1,5 +1,5 @@
-#ifndef PARAMS_H
-#define PARAMS_H
+#ifndef CSIDH_P512_PARAMS_H
+#define CSIDH_P512_PARAMS_H
 
 #include <stdint.h>
 
@@ -20,6 +20,6 @@ static const unsigned primes[NUM_PRIMES] = {
     317, 331, 337, 347, 349, 353, 359, 367, 373, 587,
 };
 
-#include "../constants.h"
+#include "constants.h"
 
 #endif

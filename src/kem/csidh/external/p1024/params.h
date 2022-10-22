@@ -1,5 +1,5 @@
-#ifndef PARAMS_H
-#define PARAMS_H
+#ifndef CSIDH_P1024_PARAMS_H
+#define CSIDH_P1024_PARAMS_H
 
 #include <stdint.h>
 

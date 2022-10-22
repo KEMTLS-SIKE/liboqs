@@ -155,7 +155,6 @@ int crypto_kem_dec(unsigned char *ss, const unsigned char *ct, const unsigned ch
     uint8_t Fin[CRYPTO_CIPHERTEXTBYTES + CRYPTO_BYTES];      // contains secret data via Fin_k
     uint8_t *Fin_ct = &Fin[0];
     uint8_t *Fin_k = &Fin[CRYPTO_CIPHERTEXTBYTES];           // contains secret data
-    uint8_t shake_input_seedSEprime[1 + CRYPTO_BYTES];       // contains secret data
 
     for (size_t i = 0; i < PARAMS_N * PARAMS_NBAR; i++) {
         S[i] = LE_TO_UINT16(sk_S[i]);
@@ -186,6 +185,5 @@ int crypto_kem_dec(unsigned char *ss, const unsigned char *ct, const unsigned ch
     clear_bytes(muprime, BYTES_MU);
     clear_bytes(G2out, 2*CRYPTO_BYTES);
     clear_bytes(Fin_k, CRYPTO_BYTES);
-    clear_bytes(shake_input_seedSEprime, 1 + CRYPTO_BYTES);
     return 0;
 }

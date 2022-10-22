@@ -1,6 +1,7 @@
+#ifndef CSIDH_P512_CONSTANTS_H
+#define CSIDH_P512_CONSTANTS_H
 
 #include "params.h"
-
 
 const uint64_t pbits = 511;
 
@@ -57,3 +58,4 @@ const fp first_elligator_rand = {{
 
 const unsigned cost_ratio_inv_mul = 128; /* TODO figure out exactly */
 
+#endif

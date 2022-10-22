@@ -3,7 +3,11 @@
 
 #include <stdbool.h>
 
-#include "p512/params.h"
+#ifdef CSIDH_1024
+    #include "p1024/params.h"
+#else
+    #include "p512/params.h"
+#endif
 
 typedef struct private_key {
     int8_t e[NUM_PRIMES];

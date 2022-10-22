@@ -3,9 +3,13 @@
 #include <string.h>
 #include <assert.h>
 
-#include "external/p512/params.h"
-#include "external/uint.h"
-#include "external/fp.h"
+#ifdef CSIDH_1024
+    #include "p1024/params.h"
+#else
+    #include "p512/params.h"
+#endif
+#include "uint.h"
+#include "fp.h"
 
 uint64_t *fp_mul_counter = NULL;
 uint64_t *fp_sq_counter = NULL;

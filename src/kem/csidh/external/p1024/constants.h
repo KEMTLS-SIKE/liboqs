@@ -1,6 +1,7 @@
+#ifndef CSIDH_P1024_CONSTANTS_H
+#define CSIDH_P1024_CONSTANTS_H
 
-#include <params.h>
-
+#include "params.h"
 
 const uint64_t pbits = 1020;
 
@@ -69,3 +70,4 @@ const fp first_elligator_rand = {{
 
 const unsigned cost_ratio_inv_mul = 1536; /* approximately */
 
+#endif

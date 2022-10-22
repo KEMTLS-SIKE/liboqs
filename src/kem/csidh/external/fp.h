@@ -1,9 +1,10 @@
-#ifndef FP_H
-#define FP_H
-
 #include <stdbool.h>
 
+#ifdef CSIDH_1024
+#include "p1024/params.h"
+#else
 #include "p512/params.h"
+#endif
 
 extern const fp fp_0;
 extern const fp fp_1;
@@ -29,5 +30,3 @@ void fp_inv(fp *x);
 bool fp_issquare(fp *x); /* destroys input! */
 
 void fp_random(fp *x);
-
-#endif

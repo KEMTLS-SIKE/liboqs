@@ -3,9 +3,13 @@
 #include <stddef.h>
 #include <assert.h>
 
-#include "external/p512/params.h"
-#include "external/uint.h"
-#include "external/rng.h"
+#ifdef CSIDH_1024
+    #include "p1024/params.h"
+#else
+    #include "p512/params.h"
+#endif
+#include "uint.h"
+#include "rng.h"
 
 /* assumes little-endian throughout. */
 

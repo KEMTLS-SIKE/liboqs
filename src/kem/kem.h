@@ -175,10 +175,12 @@ extern "C" {
 #define OQS_KEM_alg_sike_p751_1cca_compressed "SIKE-p751-compressed-ind1cca"
 /** Algorithm identifier for CSIDH p512 KEM. */
 #define OQS_KEM_alg_csidh_p512 "CSIDH-p512"
+/** Algorithm identifier for CSIDH p1024 KEM. */
+#define OQS_KEM_alg_csidh_p1024 "CSIDH-p1024"
 // EDIT-WHEN-ADDING-KEM
 ///// OQS_COPY_FROM_UPSTREAM_FRAGMENT_ALGS_LENGTH_START
 /** Number of algorithm identifiers above. */
-#define OQS_KEM_algs_length 71
+#define OQS_KEM_algs_length 72
 ///// OQS_COPY_FROM_UPSTREAM_FRAGMENT_ALGS_LENGTH_END
 
 /**
